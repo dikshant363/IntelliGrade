@@ -116,7 +116,10 @@ export default function TeacherDashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="hover-scale">
+        <Card
+          className="hover-scale cursor-pointer"
+          onClick={() => navigate("/submissions?status=pendingOrGrading")}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending / In Progress</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
@@ -142,7 +145,10 @@ export default function TeacherDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="hover-scale">
+        <Card
+          className="hover-scale cursor-pointer"
+          onClick={() => navigate("/submissions?status=graded")}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Graded (awaiting approval)</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
@@ -155,7 +161,10 @@ export default function TeacherDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="hover-scale">
+        <Card
+          className="hover-scale cursor-pointer"
+          onClick={() => navigate("/submissions?status=approved")}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Approved</CardTitle>
             <ClipboardList className="h-4 w-4 text-muted-foreground" />
