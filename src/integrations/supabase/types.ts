@@ -20,6 +20,9 @@ export type Database = {
           created_at: string
           id: string
           overall_feedback: string | null
+          plagiarism_explanation: string | null
+          plagiarism_risk: string | null
+          plagiarism_score: number | null
           processing_time_ms: number | null
           rubric_id: string | null
           section_grades: Json
@@ -33,6 +36,9 @@ export type Database = {
           created_at?: string
           id?: string
           overall_feedback?: string | null
+          plagiarism_explanation?: string | null
+          plagiarism_risk?: string | null
+          plagiarism_score?: number | null
           processing_time_ms?: number | null
           rubric_id?: string | null
           section_grades: Json
@@ -46,6 +52,9 @@ export type Database = {
           created_at?: string
           id?: string
           overall_feedback?: string | null
+          plagiarism_explanation?: string | null
+          plagiarism_risk?: string | null
+          plagiarism_score?: number | null
           processing_time_ms?: number | null
           rubric_id?: string | null
           section_grades?: Json
