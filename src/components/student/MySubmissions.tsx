@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +21,7 @@ type Submission = {
 
 export default function MySubmissions() {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,9 +30,9 @@ export default function MySubmissions() {
   const [dateTo, setDateTo] = useState<string>("");
 
   useEffect(() => {
-    if (user) {
-      fetchSubmissions();
-    }
+    if (!user) return;
+    fetchSubmissions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   async function fetchSubmissions() {
@@ -51,7 +52,30 @@ export default function MySubmissions() {
     }
   }
 
-  async function downloadFile(filePath: string, fileName: string) {
+  // Initialize filters from URL on first render
+  useEffect(() => {
+    const initialSearch = searchParams.get("q") ?? "";
+    const initialStatus = searchParams.get("status") ?? "all";
+    const initialFrom = searchParams.get("from") ?? "";
+    const initialTo = searchParams.get("to") ?? "";
+
+    setSearchTerm(initialSearch);
+    setStatusFilter(initialStatus);
+    setDateFrom(initialFrom);
+    setDateTo(initialTo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sync filters to URL when they change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchTerm) params.set("q", searchTerm);
+    if (statusFilter && statusFilter !== "all") params.set("status", statusFilter);
+    if (dateFrom) params.set("from", dateFrom);
+    if (dateTo) params.set("to", dateTo);
+
+    setSearchParams(params, { replace: true });
+  }, [searchTerm, statusFilter, dateFrom, dateTo, setSearchParams]);
     try {
       const { data, error } = await supabase.storage
         .from("reports")
@@ -135,6 +159,13 @@ export default function MySubmissions() {
 
     return matchesSearch && matchesStatus && matchesFrom && matchesTo;
   });
+
+  const summary = {
+    pending: submissions.filter((s) => s.status === "pending").length,
+    grading: submissions.filter((s) => s.status === "grading").length,
+    graded: submissions.filter((s) => s.status === "graded").length,
+    approved: submissions.filter((s) => s.status === "approved").length,
+  } as const;
 
   if (filteredSubmissions.length === 0) {
     return (
@@ -225,10 +256,10 @@ export default function MySubmissions() {
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {[
             { value: "all", label: "All" },
-            { value: "pending", label: "Pending" },
-            { value: "grading", label: "Grading" },
-            { value: "graded", label: "Graded" },
-            { value: "approved", label: "Approved" },
+            { value: "pending", label: `Pending (${summary.pending})` },
+            { value: "grading", label: `Grading (${summary.grading})` },
+            { value: "graded", label: `Graded (${summary.graded})` },
+            { value: "approved", label: `Approved (${summary.approved})` },
           ].map((option) => (
             <Button
               key={option.value}
