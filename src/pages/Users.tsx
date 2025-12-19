@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Users as UsersIcon, Shield, BookOpen, GraduationCap } from "lucide-react";
 
@@ -29,6 +31,9 @@ export default function Users() {
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "teacher" | "student">("all");
+  const [newEmail, setNewEmail] = useState("");
+  const [newRole, setNewRole] = useState<"teacher" | "student" | "admin" | "">("");
+  const [creating, setCreating] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -75,7 +80,6 @@ export default function Users() {
 
   async function handleRoleChange(userId: string, newRole: "admin" | "teacher" | "student") {
     try {
-      // First, delete existing role
       const { error: deleteError } = await supabase
         .from("user_roles")
         .delete()
@@ -83,7 +87,6 @@ export default function Users() {
 
       if (deleteError) throw deleteError;
 
-      // Then insert new role
       const { error: insertError } = await supabase
         .from("user_roles")
         .insert({ user_id: userId, role: newRole });
@@ -94,6 +97,37 @@ export default function Users() {
       fetchUsers();
     } catch (error: any) {
       toast.error("Failed to update role: " + error.message);
+    }
+  }
+
+  async function handleCreateAccount(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newEmail || !newRole) {
+      toast.error("Please provide an email and select a role");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-create-user", {
+        body: { email: newEmail, role: newRole },
+      });
+
+      if (error) throw error;
+
+      toast.success(
+        `Account created for ${data.email}. Temporary password: ${data.password}`,
+      );
+      setNewEmail("");
+      setNewRole("");
+      fetchUsers();
+    } catch (error: any) {
+      console.error("Create account error", error);
+      toast.error(
+        error.message || error.error || "Failed to create account. Check console logs.",
+      );
+    } finally {
+      setCreating(false);
     }
   }
 
@@ -143,7 +177,7 @@ export default function Users() {
           <div>
             <h1 className="text-3xl font-bold">User Management</h1>
             <p className="text-muted-foreground text-sm">
-              View user IDs and assign roles to control access
+              View user IDs, create accounts, and assign roles
             </p>
           </div>
         </div>
@@ -161,6 +195,61 @@ export default function Users() {
           ))}
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Create Teacher/Student Account</CardTitle>
+          <CardDescription>
+            Generate a login for a teacher or student; they can later change their password.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form
+            onSubmit={handleCreateAccount}
+            className="flex flex-col gap-3 md:flex-row md:items-end"
+          >
+            <div className="flex-1 space-y-1">
+              <label className="text-xs font-medium text-muted-foreground" htmlFor="new-email">
+                Email
+              </label>
+              <Input
+                id="new-email"
+                type="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="teacher@example.edu"
+                required
+              />
+            </div>
+            <div className="w-full md:w-40 space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">Role</label>
+              <Select
+                value={newRole}
+                onValueChange={(value) => setNewRole(value as "teacher" | "student" | "admin")}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="teacher">Teacher</SelectItem>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              type="submit"
+              className="w-full md:w-auto"
+              disabled={creating}
+            >
+              {creating ? "Creating..." : "Create account"}
+            </Button>
+          </form>
+          <p className="mt-2 text-xs text-muted-foreground">
+            A temporary password will be generated and shown once. Share it securely with the user so they can log in via the regular login page.
+          </p>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
