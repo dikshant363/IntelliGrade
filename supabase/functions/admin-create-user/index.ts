@@ -94,17 +94,20 @@ serve(async (req) => {
       });
     }
 
-    const { error: roleInsertError } = await adminClient
+    const { error: roleInsertError } = await supabase
       .from("user_roles")
       .insert({ user_id: created.user.id, role });
-
-    if (roleInsertError) {
-      console.error("Failed to insert role", roleInsertError);
-      return new Response(JSON.stringify({ error: "User created but role assignment failed" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+ 
+     if (roleInsertError) {
+       console.error("Failed to insert role", roleInsertError);
+       return new Response(
+         JSON.stringify({ error: roleInsertError.message || "User created but role assignment failed" }),
+         {
+           status: 500,
+           headers: { ...corsHeaders, "Content-Type": "application/json" },
+         },
+       );
+     }
 
     return new Response(
       JSON.stringify({
