@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ArrowLeft, FileText, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, FileText, Loader2, Sparkles, Download } from "lucide-react";
 import GradingResults from "@/components/student/GradingResults";
+import jsPDF from "jspdf";
 
 type Submission = {
   id: string;
@@ -107,6 +108,105 @@ export default function SubmissionDetail() {
     }
   }
 
+  async function handleDownloadReport() {
+    if (!submission || !gradingResult) {
+      toast.error("No grading data available to export yet");
+      return;
+    }
+
+    const doc = new jsPDF();
+    const left = 14;
+    let y = 20;
+
+    doc.setFontSize(18);
+    doc.text("IntelliGrade AI - Score Report", left, y);
+    y += 10;
+
+    doc.setFontSize(12);
+    doc.text(`Submission: ${submission.file_name}`, left, y);
+    y += 6;
+    doc.text(`Submitted on: ${new Date(submission.created_at).toLocaleString()}`, left, y);
+    y += 6;
+
+    const totalMax = gradingResult.total_max_marks;
+    const finalTotal = gradingResult.is_final_approved && gradingResult.final_total_marks != null
+      ? gradingResult.final_total_marks
+      : gradingResult.total_marks_awarded;
+
+    doc.text(`Score: ${finalTotal}/${totalMax}`, left, y);
+    y += 8;
+
+    if (gradingResult.plagiarism_score != null) {
+      const risk = gradingResult.plagiarism_risk || "Unknown";
+      doc.text(
+        `Plagiarism indicator: ${gradingResult.plagiarism_score}% (${risk})`,
+        left,
+        y,
+      );
+      y += 6;
+      if (gradingResult.plagiarism_explanation) {
+        const split = doc.splitTextToSize(
+          `Note: ${gradingResult.plagiarism_explanation}`,
+          180,
+        );
+        doc.text(split, left, y);
+        y += split.length * 6 + 2;
+      }
+    }
+
+    if (gradingResult.final_overall_feedback || gradingResult.overall_feedback) {
+      y += 4;
+      doc.setFontSize(14);
+      doc.text("Overall Feedback", left, y);
+      y += 6;
+      doc.setFontSize(12);
+      const overall = gradingResult.final_overall_feedback || gradingResult.overall_feedback;
+      const split = doc.splitTextToSize(overall, 180);
+      doc.text(split, left, y);
+      y += split.length * 6 + 4;
+    }
+
+    const sections =
+      gradingResult.is_final_approved && gradingResult.final_section_grades
+        ? gradingResult.final_section_grades
+        : gradingResult.section_grades;
+
+    doc.setFontSize(14);
+    doc.text("Section-wise Marks & Feedback", left, y);
+    y += 8;
+    doc.setFontSize(12);
+
+    sections.forEach((section: any, index: number) => {
+      if (y > 260) {
+        doc.addPage();
+        y = 20;
+      }
+
+      doc.text(
+        `${index + 1}. ${section.section_name} - ${section.marks_awarded}/${section.max_marks}`,
+        left,
+        y,
+      );
+      y += 6;
+
+      if (section.feedback) {
+        const feedbackLines = doc.splitTextToSize(section.feedback, 180);
+        doc.text(feedbackLines, left, y);
+        y += feedbackLines.length * 6 + 2;
+      }
+
+      if (section.similarity_score != null) {
+        doc.text(`Rubric match: ${section.similarity_score}%`, left, y);
+        y += 6;
+      }
+
+      y += 2;
+    });
+
+    doc.save(`intelligrade-report-${submission.id}.pdf`);
+    toast.success("PDF report downloaded");
+  }
+
   async function handleSaveOverrides(approve: boolean) {
     if (!gradingResult || !overrideSections || !submission || !user) return;
 
@@ -204,9 +304,22 @@ export default function SubmissionDetail() {
                 Submitted on {new Date(submission.created_at).toLocaleString()}
               </CardDescription>
             </div>
-            <Badge variant={submission.status === "approved" ? "default" : "secondary"}>
-              {submission.status}
-            </Badge>
+            <div className="flex flex-col items-end gap-2">
+              <Badge variant={submission.status === "approved" ? "default" : "secondary"}>
+                {submission.status}
+              </Badge>
+              {gradingResult && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={handleDownloadReport}
+                >
+                  <Download className="h-3 w-3 mr-1" />
+                  Download report
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
