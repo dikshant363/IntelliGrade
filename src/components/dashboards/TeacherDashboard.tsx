@@ -17,10 +17,24 @@ type SubmissionSummary = {
 export default function TeacherDashboard() {
   const [summary, setSummary] = useState<SubmissionSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [demoUsageToday, setDemoUsageToday] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchSummary();
+
+    const today = new Date().toISOString().slice(0, 10);
+    const stored = localStorage.getItem("intelligrade-demo-usage");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as { date: string; count: number };
+        if (parsed.date === today && typeof parsed.count === "number") {
+          setDemoUsageToday(parsed.count);
+        }
+      } catch {
+        // ignore parse errors
+      }
+    }
   }, []);
 
   async function fetchSummary() {
@@ -59,6 +73,15 @@ export default function TeacherDashboard() {
   }
 
   async function handleDemoMode() {
+    // Track usage locally per day
+    const today = new Date().toISOString().slice(0, 10);
+    setDemoUsageToday((prev) => {
+      const next = prev + 1;
+      const payload = { date: today, count: next };
+      localStorage.setItem("intelligrade-demo-usage", JSON.stringify(payload));
+      return next;
+    });
+
     try {
       // Prefer an approved submission for demo; fall back to graded
       const { data: approved, error: approvedError } = await supabase
@@ -126,6 +149,9 @@ export default function TeacherDashboard() {
           <p className="text-[11px] text-muted-foreground max-w-xs text-right">
             Requires at least one submission to be graded or approved. Otherwise, you’ll be
             taken to pending submissions to run grading first.
+          </p>
+          <p className="text-[11px] text-muted-foreground">
+            Used today: <span className="font-semibold">{demoUsageToday}</span>
           </p>
         </div>
       </div>
