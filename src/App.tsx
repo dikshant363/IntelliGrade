@@ -12,6 +12,7 @@ import Users from "./pages/Users";
 import Rubrics from "./pages/Rubrics";
 import SubmissionDetail from "./pages/SubmissionDetail";
 import Submissions from "./pages/Submissions";
+import MySubmissionsPage from "./pages/MySubmissionsPage";
 import DashboardLayout from "./components/layouts/DashboardLayout";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/users" element={<Users />} />
               <Route path="/rubrics" element={<Rubrics />} />
               <Route path="/submissions" element={<Submissions />} />
+              <Route path="/my-submissions" element={<MySubmissionsPage />} />
               <Route path="/submission/:id" element={<SubmissionDetail />} />
               {/* Additional protected routes will go here */}
             </Route>
