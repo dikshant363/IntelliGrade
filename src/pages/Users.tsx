@@ -129,10 +129,17 @@ export default function Users() {
         body: { email: newEmail, role: newRole, password: newPassword },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("admin-create-user error", error, data);
+        const apiMessage =
+          (data as any)?.error ||
+          (typeof error.message === "string" && error.message) ||
+          "Failed to create account";
+        throw new Error(apiMessage);
+      }
 
       toast.success(
-        `Account created for ${data.email}. Temporary password: ${data.password}`,
+        `Account created for ${data.email}. Password: ${data.password}`,
       );
 
       setLastTempPassword(data.password ?? null);
@@ -157,9 +164,7 @@ export default function Users() {
       fetchUsers();
     } catch (error: any) {
       console.error("Create account error", error);
-      toast.error(
-        error.message || error.error || "Failed to create account. Check console logs.",
-      );
+      toast.error(error.message || "Failed to create account. Check console logs.");
     } finally {
       setCreating(false);
     }
