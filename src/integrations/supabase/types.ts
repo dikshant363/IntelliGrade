@@ -32,6 +32,45 @@ export type Database = {
         }
         Relationships: []
       }
+      rubrics: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          sections: Json
+          subject: string
+          teacher_id: string
+          title: string
+          total_marks: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          sections: Json
+          subject: string
+          teacher_id: string
+          title: string
+          total_marks: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          sections?: Json
+          subject?: string
+          teacher_id?: string
+          title?: string
+          total_marks?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       submissions: {
         Row: {
           created_at: string
@@ -69,7 +108,15 @@ export type Database = {
           student_id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_rubric"
+            columns: ["rubric_id"]
+            isOneToOne: false
+            referencedRelation: "rubrics"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
