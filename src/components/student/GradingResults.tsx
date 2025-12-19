@@ -10,6 +10,8 @@ type SectionGrade = {
   marks_awarded: number;
   max_marks: number;
   feedback: string;
+  similarity_score?: number;
+  similarity_explanation?: string;
 };
 
 type GradingResult = {
@@ -43,7 +45,14 @@ export default function GradingResults({ submissionId }: { submissionId: string 
       if (data) {
         setResult({
           ...data,
-          section_grades: data.section_grades as unknown as SectionGrade[],
+          section_grades: (data.section_grades as any[]).map((s) => ({
+            section_name: s.section_name,
+            marks_awarded: s.marks_awarded,
+            max_marks: s.max_marks,
+            feedback: s.feedback,
+            similarity_score: s.similarity_score,
+            similarity_explanation: s.similarity_explanation,
+          })),
         });
       }
     } catch (error: any) {
@@ -115,21 +124,50 @@ export default function GradingResults({ submissionId }: { submissionId: string 
       <Card>
         <CardHeader>
           <CardTitle>Section-wise Breakdown</CardTitle>
-          <CardDescription>Detailed marks and feedback for each section</CardDescription>
+          <CardDescription>Detailed marks, similarity, and feedback for each section</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {result.section_grades.map((section, index) => {
             const sectionPercentage = Math.round((section.marks_awarded / section.max_marks) * 100);
+            const similarity = section.similarity_score ?? null;
+            const similarityLabel =
+              similarity === null
+                ? null
+                : similarity >= 80
+                  ? "High match"
+                  : similarity >= 60
+                    ? "Good match"
+                    : similarity >= 40
+                      ? "Partial match"
+                      : "Low match";
             return (
               <div key={index} className="border rounded-lg p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-semibold">{section.section_name}</h4>
+                <div className="flex items-start justify-between mb-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold">{section.section_name}</h4>
+                    {similarity !== null && (
+                      <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>Rubric match:</span>
+                        <Badge variant={similarity >= 80 ? "default" : similarity >= 60 ? "secondary" : "outline"}>
+                          {similarityLabel} ({similarity}%)
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
                   <Badge variant="outline">
                     {section.marks_awarded}/{section.max_marks}
                   </Badge>
                 </div>
-                <Progress value={sectionPercentage} className="mb-3" />
-                <p className="text-sm text-muted-foreground">{section.feedback}</p>
+                <Progress value={sectionPercentage} className="mb-2" />
+                {similarity !== null && (
+                  <Progress value={similarity} className="mb-2" />
+                )}
+                <p className="text-sm text-muted-foreground mb-1">{section.feedback}</p>
+                {section.similarity_explanation && (
+                  <p className="text-xs text-muted-foreground">
+                    <span className="font-medium">Why this match score:</span> {section.similarity_explanation}
+                  </p>
+                )}
               </div>
             );
           })}
