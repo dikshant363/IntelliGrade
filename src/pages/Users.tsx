@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Users as UsersIcon, Shield, BookOpen, GraduationCap } from "lucide-react";
 
@@ -33,6 +34,7 @@ export default function Users() {
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "teacher" | "student">("all");
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState<"teacher" | "student" | "admin" | "">("");
+  const [sendWelcome, setSendWelcome] = useState(true);
   const [creating, setCreating] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -118,6 +120,19 @@ export default function Users() {
       toast.success(
         `Account created for ${data.email}. Temporary password: ${data.password}`,
       );
+
+      if (sendWelcome) {
+        try {
+          await supabase.functions.invoke("send-welcome-email", {
+            body: { email: data.email, password: data.password, role: data.role },
+          });
+          toast.success("Welcome email sent");
+        } catch (emailError: any) {
+          console.error("Welcome email error", emailError);
+          toast.error("Account created, but failed to send welcome email");
+        }
+      }
+
       setNewEmail("");
       setNewRole("");
       fetchUsers();
@@ -236,6 +251,19 @@ export default function Users() {
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-center gap-2 mt-2 md:mt-0">
+              <Checkbox
+                id="send-welcome"
+                checked={sendWelcome}
+                onCheckedChange={(val) => setSendWelcome(Boolean(val))}
+              />
+              <label
+                htmlFor="send-welcome"
+                className="text-xs text-muted-foreground select-none cursor-pointer"
+              >
+                Send welcome email
+              </label>
             </div>
             <Button
               type="submit"
