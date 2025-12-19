@@ -90,9 +90,18 @@ export default function TeacherDashboard() {
       }
 
       if (!target) {
-        toast.info("No graded or approved submissions yet. Run grading once, then try Demo Mode again.");
+        if (summary && summary.total === 0) {
+          toast.info("No submissions in the system yet. Ask a student to upload a report first.");
+          return;
+        }
+
+        toast.info(
+          "No graded or approved submissions yet. Taking you to pending submissions so you can run grading once, then try Demo Mode again.",
+        );
+        navigate("/submissions?status=pendingOrGrading");
         return;
       }
+
 
       navigate(`/submissions/${target.id}`);
     } catch (error) {
