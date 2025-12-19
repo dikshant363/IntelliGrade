@@ -18,7 +18,13 @@ export type Database = {
         Row: {
           ai_model: string
           created_at: string
+          final_approved_at: string | null
+          final_approved_by: string | null
+          final_overall_feedback: string | null
+          final_section_grades: Json | null
+          final_total_marks: number | null
           id: string
+          is_final_approved: boolean
           overall_feedback: string | null
           plagiarism_explanation: string | null
           plagiarism_risk: string | null
@@ -34,7 +40,13 @@ export type Database = {
         Insert: {
           ai_model?: string
           created_at?: string
+          final_approved_at?: string | null
+          final_approved_by?: string | null
+          final_overall_feedback?: string | null
+          final_section_grades?: Json | null
+          final_total_marks?: number | null
           id?: string
+          is_final_approved?: boolean
           overall_feedback?: string | null
           plagiarism_explanation?: string | null
           plagiarism_risk?: string | null
@@ -50,7 +62,13 @@ export type Database = {
         Update: {
           ai_model?: string
           created_at?: string
+          final_approved_at?: string | null
+          final_approved_by?: string | null
+          final_overall_feedback?: string | null
+          final_section_grades?: Json | null
+          final_total_marks?: number | null
           id?: string
+          is_final_approved?: boolean
           overall_feedback?: string | null
           plagiarism_explanation?: string | null
           plagiarism_risk?: string | null
