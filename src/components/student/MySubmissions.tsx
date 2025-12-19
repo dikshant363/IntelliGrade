@@ -22,6 +22,7 @@ type Submission = {
 export default function MySubmissions() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,30 +30,31 @@ export default function MySubmissions() {
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
 
+  // Load submissions when user is available
   useEffect(() => {
     if (!user) return;
+
+    const fetchSubmissions = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("submissions")
+          .select("*")
+          .eq("student_id", user.id)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+        setSubmissions(data || []);
+      } catch (error: any) {
+        toast.error("Failed to load submissions: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchSubmissions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  async function fetchSubmissions() {
-    try {
-      const { data, error } = await supabase
-        .from("submissions")
-        .select("*")
-        .eq("student_id", user?.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setSubmissions(data || []);
-    } catch (error: any) {
-      toast.error("Failed to load submissions: " + error.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  // Initialize filters from URL on first render
+  // Initialize filters from URL once
   useEffect(() => {
     const initialSearch = searchParams.get("q") ?? "";
     const initialStatus = searchParams.get("status") ?? "all";
@@ -76,6 +78,8 @@ export default function MySubmissions() {
 
     setSearchParams(params, { replace: true });
   }, [searchTerm, statusFilter, dateFrom, dateTo, setSearchParams]);
+
+  async function downloadFile(filePath: string, fileName: string) {
     try {
       const { data, error } = await supabase.storage
         .from("reports")
@@ -83,7 +87,6 @@ export default function MySubmissions() {
 
       if (error) throw error;
 
-      // Create download link
       const url = URL.createObjectURL(data);
       const a = document.createElement("a");
       a.href = url;
@@ -391,4 +394,3 @@ export default function MySubmissions() {
     </Card>
   );
 }
-
