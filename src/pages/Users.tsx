@@ -125,6 +125,21 @@ export default function Users() {
 
     setCreating(true);
     try {
+      // Check if a profile already exists with this email before calling the edge function
+      const { data: existingProfiles, error: existingError } = await supabase
+        .from("profiles")
+        .select("id")
+        .ilike("email", newEmail.trim());
+
+      if (existingError) {
+        console.error("Error checking existing profiles", existingError);
+      }
+
+      if (existingProfiles && existingProfiles.length > 0) {
+        toast.error("A user with this email address has already been registered");
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("admin-create-user", {
         body: { email: newEmail, role: newRole, password: newPassword },
       });
