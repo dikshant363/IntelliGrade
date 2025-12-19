@@ -34,6 +34,8 @@ export default function Users() {
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "teacher" | "student">("all");
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState<"teacher" | "student" | "admin" | "">("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [sendWelcome, setSendWelcome] = useState(true);
   const [creating, setCreating] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -111,10 +113,20 @@ export default function Users() {
       return;
     }
 
+    if (!newPassword || newPassword.length < 8) {
+      toast.error("Please enter a password with at least 8 characters");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error("Password and confirmation do not match");
+      return;
+    }
+
     setCreating(true);
     try {
       const { data, error } = await supabase.functions.invoke("admin-create-user", {
-        body: { email: newEmail, role: newRole },
+        body: { email: newEmail, role: newRole, password: newPassword },
       });
 
       if (error) throw error;
@@ -140,6 +152,8 @@ export default function Users() {
 
       setNewEmail("");
       setNewRole("");
+      setNewPassword("");
+      setConfirmPassword("");
       fetchUsers();
     } catch (error: any) {
       console.error("Create account error", error);
@@ -226,9 +240,9 @@ export default function Users() {
         <CardContent>
           <form
             onSubmit={handleCreateAccount}
-            className="flex flex-col gap-3 md:flex-row md:items-end"
+            className="flex flex-col gap-3 md:grid md:grid-cols-2 md:items-end"
           >
-            <div className="flex-1 space-y-1">
+            <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground" htmlFor="new-email">
                 Email
               </label>
@@ -241,13 +255,15 @@ export default function Users() {
                 required
               />
             </div>
-            <div className="w-full md:w-40 space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Role</label>
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground" htmlFor="new-role">
+                Role
+              </label>
               <Select
                 value={newRole}
                 onValueChange={(value) => setNewRole(value as "teacher" | "student" | "admin")}
               >
-                <SelectTrigger>
+                <SelectTrigger id="new-role">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -256,6 +272,38 @@ export default function Users() {
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-1">
+              <label
+                className="text-xs font-medium text-muted-foreground"
+                htmlFor="new-password"
+              >
+                Password
+              </label>
+              <Input
+                id="new-password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Set initial password"
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label
+                className="text-xs font-medium text-muted-foreground"
+                htmlFor="confirm-password"
+              >
+                Confirm password
+              </label>
+              <Input
+                id="confirm-password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Repeat password"
+                required
+              />
             </div>
             <div className="flex items-center gap-2 mt-2 md:mt-0">
               <Checkbox
@@ -279,8 +327,8 @@ export default function Users() {
             </Button>
           </form>
           <p className="mt-2 text-xs text-muted-foreground">
-            A temporary password will be generated and shown here and in a toast. Share it
-            securely with the user so they can log in via the regular login page.
+            The student or teacher will log in on the same login page using this email and
+            password. They can change their password later.
           </p>
           {lastTempPassword && lastTempEmail && (
             <div className="mt-3 inline-flex items-center gap-3 rounded-md border px-3 py-2 bg-background/40">

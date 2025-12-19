@@ -20,7 +20,7 @@ serve(async (req) => {
       });
     }
 
-    const { email, role } = await req.json();
+    const { email, role, password: providedPassword } = await req.json();
 
     if (!email || !role) {
       return new Response(JSON.stringify({ error: "Email and role are required" }), {
@@ -75,13 +75,16 @@ serve(async (req) => {
       });
     }
 
-    const password = crypto.randomUUID().replace(/-/g, "").slice(0, 16);
-
-    const { data: created, error: createError } = await adminClient.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-    });
+    const password =
+      typeof providedPassword === "string" && providedPassword.length > 0
+        ? providedPassword
+        : crypto.randomUUID().replace(/-/g, "").slice(0, 16);
+ 
+     const { data: created, error: createError } = await adminClient.auth.admin.createUser({
+       email,
+       password,
+       email_confirm: true,
+     });
 
     if (createError || !created.user) {
       console.error("Create user error", createError);
