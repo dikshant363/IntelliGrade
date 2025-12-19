@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      grading_results: {
+        Row: {
+          ai_model: string
+          created_at: string
+          id: string
+          overall_feedback: string | null
+          processing_time_ms: number | null
+          rubric_id: string | null
+          section_grades: Json
+          submission_id: string
+          total_marks_awarded: number
+          total_max_marks: number
+          updated_at: string
+        }
+        Insert: {
+          ai_model?: string
+          created_at?: string
+          id?: string
+          overall_feedback?: string | null
+          processing_time_ms?: number | null
+          rubric_id?: string | null
+          section_grades: Json
+          submission_id: string
+          total_marks_awarded: number
+          total_max_marks: number
+          updated_at?: string
+        }
+        Update: {
+          ai_model?: string
+          created_at?: string
+          id?: string
+          overall_feedback?: string | null
+          processing_time_ms?: number | null
+          rubric_id?: string | null
+          section_grades?: Json
+          submission_id?: string
+          total_marks_awarded?: number
+          total_max_marks?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grading_results_rubric_id_fkey"
+            columns: ["rubric_id"]
+            isOneToOne: false
+            referencedRelation: "rubrics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grading_results_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: true
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

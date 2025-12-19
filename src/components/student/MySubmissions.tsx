@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -141,9 +142,10 @@ export default function MySubmissions() {
       <CardContent>
         <div className="space-y-3">
           {submissions.map((submission) => (
-            <div
+            <Link
               key={submission.id}
-              className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+              to={`/submission/${submission.id}`}
+              className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-3 flex-1">
                 <FileText className="h-5 w-5 text-primary" />
@@ -161,12 +163,15 @@ export default function MySubmissions() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => downloadFile(submission.file_path, submission.file_name)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    downloadFile(submission.file_path, submission.file_name);
+                  }}
                 >
                   <Download className="h-4 w-4" />
                 </Button>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </CardContent>
