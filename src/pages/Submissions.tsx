@@ -127,10 +127,26 @@ export default function Submissions() {
                 </Badge>
               </CardHeader>
               <CardContent className="flex items-center justify-between pt-0 text-xs text-muted-foreground">
-                <span>
-                  Submitted on {new Date(submission.created_at).toLocaleString()}
-                </span>
-                <span>Student ID: {submission.student_id}</span>
+                <div className="space-y-1">
+                  <span>
+                    Submitted on {new Date(submission.created_at).toLocaleString()}
+                  </span>
+                  <span className="block">Student ID: {submission.student_id}</span>
+                </div>
+                {(submission.status === "pending" || submission.status === "graded") && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="text-[11px]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/submission/${submission.id}`);
+                    }}
+                  >
+                    Grade with AI
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))}
