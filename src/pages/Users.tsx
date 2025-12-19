@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Users as UsersIcon, Shield, BookOpen, GraduationCap } from "lucide-react";
+import { Users as UsersIcon, Shield, BookOpen, GraduationCap, ClipboardCopy } from "lucide-react";
 
 type Profile = {
   id: string;
@@ -37,6 +37,8 @@ export default function Users() {
   const [sendWelcome, setSendWelcome] = useState(true);
   const [creating, setCreating] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [lastTempPassword, setLastTempPassword] = useState<string | null>(null);
+  const [lastTempEmail, setLastTempEmail] = useState<string | null>(null);
 
   useEffect(() => {
     if (role !== "admin") {
@@ -120,6 +122,9 @@ export default function Users() {
       toast.success(
         `Account created for ${data.email}. Temporary password: ${data.password}`,
       );
+
+      setLastTempPassword(data.password ?? null);
+      setLastTempEmail(data.email ?? null);
 
       if (sendWelcome) {
         try {
@@ -274,8 +279,30 @@ export default function Users() {
             </Button>
           </form>
           <p className="mt-2 text-xs text-muted-foreground">
-            A temporary password will be generated and shown once. Share it securely with the user so they can log in via the regular login page.
+            A temporary password will be generated and shown here and in a toast. Share it
+            securely with the user so they can log in via the regular login page.
           </p>
+          {lastTempPassword && lastTempEmail && (
+            <div className="mt-3 inline-flex items-center gap-3 rounded-md border px-3 py-2 bg-background/40">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-muted-foreground">Most recent account</p>
+                <p className="text-xs text-muted-foreground">{lastTempEmail}</p>
+                <p className="font-mono text-sm">Temporary password: {lastTempPassword}</p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(lastTempPassword);
+                  toast.success("Temporary password copied to clipboard");
+                }}
+              >
+                <ClipboardCopy className="h-4 w-4 mr-1" />
+                Copy
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
