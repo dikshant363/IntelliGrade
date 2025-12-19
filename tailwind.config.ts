@@ -63,6 +63,10 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontFamily: {
+        display: ["Playfair Display", "serif"],
+        sans: ["Source Sans 3", "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+      },
       keyframes: {
         "accordion-down": {
           from: {
