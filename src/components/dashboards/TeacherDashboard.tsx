@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, ClipboardList, CheckCircle, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 type SubmissionSummary = {
   pending: number;
@@ -14,6 +17,7 @@ type SubmissionSummary = {
 export default function TeacherDashboard() {
   const [summary, setSummary] = useState<SubmissionSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchSummary();
@@ -48,8 +52,52 @@ export default function TeacherDashboard() {
       });
     } catch (error) {
       console.error("Failed to load submission summary", error);
+      toast.error("Failed to load submission summary");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleDemoMode() {
+    try {
+      // Prefer an approved submission for demo; fall back to graded
+      const { data: approved, error: approvedError } = await supabase
+        .from("submissions")
+        .select("id, created_at")
+        .eq("status", "approved")
+        .order("created_at", { ascending: false })
+        .maybeSingle();
+
+      if (approvedError) {
+        console.error("Error loading approved demo submission", approvedError);
+      }
+
+      let target = approved;
+
+      if (!target) {
+        const { data: graded, error: gradedError } = await supabase
+          .from("submissions")
+          .select("id, created_at")
+          .eq("status", "graded")
+          .order("created_at", { ascending: false })
+          .maybeSingle();
+
+        if (gradedError) {
+          console.error("Error loading graded demo submission", gradedError);
+        }
+
+        target = graded;
+      }
+
+      if (!target) {
+        toast.info("No graded or approved submissions yet. Run grading once, then try Demo Mode again.");
+        return;
+      }
+
+      navigate(`/submissions/${target.id}`);
+    } catch (error) {
+      console.error("Demo mode navigation error", error);
+      toast.error("Could not open demo submission");
     }
   }
 
@@ -57,9 +105,14 @@ export default function TeacherDashboard() {
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Teacher Dashboard</h1>
-        <p className="text-muted-foreground">Academic control and grading oversight</p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Teacher Dashboard</h1>
+          <p className="text-muted-foreground">Academic control and grading oversight</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={handleDemoMode}>
+          Demo Mode: Jump to graded example
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
