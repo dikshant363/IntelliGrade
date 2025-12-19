@@ -99,6 +99,7 @@ For each section in the rubric:
 2. Assess how well it meets the stated expectations
 3. Assign marks (0 to max_marks for that section)
 4. Provide constructive feedback explaining the score
+5. Estimate how strongly the student's work matches the rubric expectations on a 0-100 scale and explain your reasoning.
 
 Be fair, objective, and constructive in your evaluation.`;
 
@@ -115,7 +116,7 @@ ${rubricText}
 REPORT CONTENT:
 ${textContent}
 
-Provide detailed section-wise grading with marks and feedback for each section.`;
+Provide detailed section-wise grading with marks, feedback, and similarity assessment for each section.`;
 
     // Call Lovable AI with tool calling for structured output
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -154,6 +155,14 @@ Provide detailed section-wise grading with marks and feedback for each section.`
                         marks_awarded: { type: "number" },
                         max_marks: { type: "number" },
                         feedback: { type: "string" },
+                        similarity_score: {
+                          type: "number",
+                          description: "Similarity or alignment score (0-100) between the student's work and rubric expectations",
+                        },
+                        similarity_explanation: {
+                          type: "string",
+                          description: "Short explanation of why this similarity score was assigned",
+                        },
                       },
                       required: ["section_name", "marks_awarded", "max_marks", "feedback"],
                     },
