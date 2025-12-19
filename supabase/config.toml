@@ -1,1 +1,4 @@
 project_id = "tarblqecmyyimlnfmvkt"
+
+[functions.grade-submission]
+verify_jwt = false
