@@ -28,6 +28,7 @@ export default function Users() {
   const { role, user } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserWithRole[]>([]);
+  const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "teacher" | "student">("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -131,28 +132,54 @@ export default function Users() {
     );
   }
 
+  const filteredUsers =
+    roleFilter === "all" ? users : users.filter((u) => u.role === roleFilter);
+
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <UsersIcon className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">User Management</h1>
-          <p className="text-muted-foreground">View and manage user roles</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <UsersIcon className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-3xl font-bold">User Management</h1>
+            <p className="text-muted-foreground text-sm">
+              View user IDs and assign roles to control access
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-muted-foreground mr-1">Filter by role:</span>
+          {(["all", "admin", "teacher", "student"] as const).map((f) => (
+            <Badge
+              key={f}
+              variant={roleFilter === f ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => setRoleFilter(f)}
+            >
+              {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
+            </Badge>
+          ))}
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>All Users ({users.length})</CardTitle>
-          <CardDescription>Assign roles to control system access</CardDescription>
+          <CardTitle>
+            Users ({filteredUsers.length}
+            {roleFilter !== "all" && ` of ${users.length}`} )
+          </CardTitle>
+          <CardDescription>
+            Assign roles and verify IDs for teachers and students
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {users.length === 0 ? (
+          {filteredUsers.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">No users found</p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>User ID</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Joined</TableHead>
@@ -160,8 +187,11 @@ export default function Users() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((u) => (
+                {filteredUsers.map((u) => (
                   <TableRow key={u.id}>
+                    <TableCell className="font-mono text-xs text-muted-foreground max-w-[220px] truncate">
+                      {u.id}
+                    </TableCell>
                     <TableCell className="font-medium">
                       {u.email || "No email"}
                       {u.id === user?.id && (
