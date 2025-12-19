@@ -22,6 +22,11 @@ type GradingResult = {
   overall_feedback: string;
   ai_model: string;
   created_at: string;
+  // Teacher override fields
+  final_section_grades: SectionGrade[] | null;
+  final_total_marks: number | null;
+  final_overall_feedback: string | null;
+  is_final_approved: boolean;
 };
 
 export default function GradingResults({ submissionId }: { submissionId: string }) {
@@ -43,16 +48,33 @@ export default function GradingResults({ submissionId }: { submissionId: string 
       if (error) throw error;
       
       if (data) {
+        const baseSections = (data.section_grades as any[]).map((s) => ({
+          section_name: s.section_name,
+          marks_awarded: s.marks_awarded,
+          max_marks: s.max_marks,
+          feedback: s.feedback,
+          similarity_score: s.similarity_score,
+          similarity_explanation: s.similarity_explanation,
+        }));
+
+        const finalSectionsRaw = (data.final_section_grades as any[]) || null;
+        const finalSections = finalSectionsRaw
+          ? finalSectionsRaw.map((s) => ({
+              section_name: s.section_name,
+              marks_awarded: s.marks_awarded,
+              max_marks: s.max_marks,
+              feedback: s.feedback,
+              similarity_score: s.similarity_score,
+              similarity_explanation: s.similarity_explanation,
+            }))
+          : null;
+
         setResult({
           ...data,
-          section_grades: (data.section_grades as any[]).map((s) => ({
-            section_name: s.section_name,
-            marks_awarded: s.marks_awarded,
-            max_marks: s.max_marks,
-            feedback: s.feedback,
-            similarity_score: s.similarity_score,
-            similarity_explanation: s.similarity_explanation,
-          })),
+          section_grades: baseSections,
+          final_section_grades: finalSections,
+          final_total_marks: data.final_total_marks ?? null,
+          final_overall_feedback: data.final_overall_feedback ?? null,
         });
       }
     } catch (error: any) {
@@ -85,7 +107,14 @@ export default function GradingResults({ submissionId }: { submissionId: string 
     );
   }
 
-  const percentage = Math.round((result.total_marks_awarded / result.total_max_marks) * 100);
+  const isFinal = result.is_final_approved && result.final_total_marks != null && result.final_section_grades;
+  const displayTotal = isFinal ? result.final_total_marks! : result.total_marks_awarded;
+  const displaySections = isFinal ? result.final_section_grades! : result.section_grades;
+  const displayOverallFeedback = isFinal && result.final_overall_feedback
+    ? result.final_overall_feedback
+    : result.overall_feedback;
+
+  const percentage = Math.round((displayTotal / result.total_max_marks) * 100);
 
   return (
     <div className="space-y-6">
@@ -95,13 +124,17 @@ export default function GradingResults({ submissionId }: { submissionId: string 
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Award className="h-5 w-5 text-primary" />
-                Grading Results
+                {isFinal ? "Final Grade" : "AI Grading Results"}
               </CardTitle>
-              <CardDescription>AI-generated evaluation with section-wise feedback</CardDescription>
+              <CardDescription>
+                {isFinal
+                  ? "Teacher-approved final grade based on AI evaluation"
+                  : "AI-generated evaluation with section-wise feedback"}
+              </CardDescription>
             </div>
             <div className="text-right">
               <div className="text-3xl font-bold text-primary">
-                {result.total_marks_awarded}/{result.total_max_marks}
+                {displayTotal}/{result.total_max_marks}
               </div>
               <Badge variant={percentage >= 70 ? "default" : percentage >= 50 ? "secondary" : "outline"}>
                 {percentage}%
@@ -111,11 +144,18 @@ export default function GradingResults({ submissionId }: { submissionId: string 
         </CardHeader>
         <CardContent>
           <Progress value={percentage} className="mb-4" />
+
+          {isFinal && (
+            <p className="text-xs text-muted-foreground mb-2">
+              Based on AI suggestion of {result.total_marks_awarded}/{result.total_max_marks},
+              with teacher review and possible adjustments.
+            </p>
+          )}
           
-          {result.overall_feedback && (
+          {displayOverallFeedback && (
             <div className="p-4 bg-muted rounded-lg mb-4">
               <h4 className="font-semibold mb-2">Overall Feedback</h4>
-              <p className="text-sm text-muted-foreground">{result.overall_feedback}</p>
+              <p className="text-sm text-muted-foreground">{displayOverallFeedback}</p>
             </div>
           )}
         </CardContent>
@@ -124,10 +164,12 @@ export default function GradingResults({ submissionId }: { submissionId: string 
       <Card>
         <CardHeader>
           <CardTitle>Section-wise Breakdown</CardTitle>
-          <CardDescription>Detailed marks, similarity, and feedback for each section</CardDescription>
+          <CardDescription>
+            Detailed marks, similarity, and feedback for each section
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {result.section_grades.map((section, index) => {
+          {displaySections.map((section, index) => {
             const sectionPercentage = Math.round((section.marks_awarded / section.max_marks) * 100);
             const similarity = section.similarity_score ?? null;
             const similarityLabel =
