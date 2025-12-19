@@ -5,7 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Clock, CheckCircle, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileText, Download, Clock, CheckCircle, Loader2, Filter } from "lucide-react";
 import { toast } from "sonner";
 
 type Submission = {
@@ -21,6 +23,10 @@ export default function MySubmissions() {
   const { user } = useAuth();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
 
   useEffect(() => {
     if (user) {
@@ -115,7 +121,22 @@ export default function MySubmissions() {
     );
   }
 
-  if (submissions.length === 0) {
+  const filteredSubmissions = submissions.filter((submission) => {
+    const matchesSearch = submission.file_name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase().trim());
+
+    const matchesStatus =
+      statusFilter === "all" ? true : submission.status === statusFilter;
+
+    const created = new Date(submission.created_at);
+    const matchesFrom = dateFrom ? created >= new Date(dateFrom) : true;
+    const matchesTo = dateTo ? created <= new Date(dateTo) : true;
+
+    return matchesSearch && matchesStatus && matchesFrom && matchesTo;
+  });
+
+  if (filteredSubmissions.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -123,10 +144,65 @@ export default function MySubmissions() {
           <CardDescription>View your uploaded reports and grades</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="flex flex-col gap-4 mb-4">
+            <div className="flex flex-col md:flex-row md:items-end gap-3">
+              <div className="flex-1 space-y-1">
+                <label className="text-xs font-medium text-muted-foreground" htmlFor="search-submissions">
+                  Search by file name
+                </label>
+                <Input
+                  id="search-submissions"
+                  placeholder="e.g. Midterm report.pdf"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="w-full md:w-48 space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">Status</label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="grading">Grading</SelectItem>
+                    <SelectItem value="graded">Graded</SelectItem>
+                    <SelectItem value="approved">Approved</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-3 w-full md:w-auto">
+                <div className="flex-1 space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground" htmlFor="date-from">
+                    From
+                  </label>
+                  <Input
+                    id="date-from"
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                  />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground" htmlFor="date-to">
+                    To
+                  </label>
+                  <Input
+                    id="date-to"
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="text-center py-8 text-muted-foreground">
             <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p>No submissions yet</p>
-            <p className="text-sm">Upload your first report to get started!</p>
+            <p>No submissions match your filters</p>
+            <p className="text-sm">Try adjusting the search, status, or date range.</p>
           </div>
         </CardContent>
       </Card>
@@ -136,12 +212,84 @@ export default function MySubmissions() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>My Submissions ({submissions.length})</CardTitle>
-        <CardDescription>Track your uploaded reports and grades</CardDescription>
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div>
+            <CardTitle>My Submissions ({filteredSubmissions.length})</CardTitle>
+            <CardDescription>Track your uploaded reports and grades</CardDescription>
+          </div>
+          <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <Filter className="h-3 w-3" />
+            <span>Filter by name, status, or date range</span>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
+        <div className="flex flex-col gap-4 mb-4">
+          <div className="flex flex-col md:flex-row md:items-end gap-3">
+            <div className="flex-1 space-y-1">
+              <label
+                className="text-xs font-medium text-muted-foreground"
+                htmlFor="search-submissions-top"
+              >
+                Search by file name
+              </label>
+              <Input
+                id="search-submissions-top"
+                placeholder="e.g. Midterm report.pdf"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="w-full md:w-48 space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">Status</label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="grading">Grading</SelectItem>
+                  <SelectItem value="graded">Graded</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-3 w-full md:w-auto">
+              <div className="flex-1 space-y-1">
+                <label
+                  className="text-xs font-medium text-muted-foreground"
+                  htmlFor="date-from-top"
+                >
+                  From
+                </label>
+                <Input
+                  id="date-from-top"
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                />
+              </div>
+              <div className="flex-1 space-y-1">
+                <label
+                  className="text-xs font-medium text-muted-foreground"
+                  htmlFor="date-to-top"
+                >
+                  To
+                </label>
+                <Input
+                  id="date-to-top"
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="space-y-3">
-          {submissions.map((submission) => (
+          {filteredSubmissions.map((submission) => (
             <Link
               key={submission.id}
               to={`/submission/${submission.id}`}
@@ -178,3 +326,4 @@ export default function MySubmissions() {
     </Card>
   );
 }
+
