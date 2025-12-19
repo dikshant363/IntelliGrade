@@ -222,6 +222,40 @@ export default function MySubmissions() {
             <span>Filter by name, status, or date range</span>
           </div>
         </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          {[
+            { value: "all", label: "All" },
+            { value: "pending", label: "Pending" },
+            { value: "grading", label: "Grading" },
+            { value: "graded", label: "Graded" },
+            { value: "approved", label: "Approved" },
+          ].map((option) => (
+            <Button
+              key={option.value}
+              type="button"
+              variant={statusFilter === option.value ? "default" : "outline"}
+              size="sm"
+              className="text-xs px-2 py-1"
+              onClick={() => setStatusFilter(option.value)}
+            >
+              {option.label}
+            </Button>
+          ))}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-xs ml-auto"
+            onClick={() => {
+              setSearchTerm("");
+              setStatusFilter("all");
+              setDateFrom("");
+              setDateTo("");
+            }}
+          >
+            Clear filters
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4 mb-4">
