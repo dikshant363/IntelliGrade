@@ -225,10 +225,14 @@ export default function TeacherDashboard() {
             <CardTitle>Rubric Management</CardTitle>
             <CardDescription>Create and manage grading criteria</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <p className="text-muted-foreground text-sm">
-              Rubric creation interface will be implemented in Phase 4
+              Define reusable grading templates and section-wise maximum marks for AI-assisted
+              evaluation.
             </p>
+            <Button size="sm" onClick={() => navigate("/rubrics")}>
+              Go to Rubrics
+            </Button>
           </CardContent>
         </Card>
 
@@ -237,13 +241,17 @@ export default function TeacherDashboard() {
             <CardTitle>Student Submissions</CardTitle>
             <CardDescription>Review AI-graded reports</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <p className="text-muted-foreground text-sm">
-              Submission review interface will be implemented in Phase 3
+              Browse pending, graded, and approved reports. Run AI grading and finalize marks.
             </p>
+            <Button variant="outline" size="sm" onClick={() => navigate("/submissions")}>
+              View Submissions
+            </Button>
           </CardContent>
         </Card>
       </div>
     </div>
   );
 }
+
