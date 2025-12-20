@@ -1,7 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileText, Settings, Activity } from "lucide-react";
+import { Users, FileText, Settings, Activity, BarChart2, ClipboardList } from "lucide-react";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+
   return (
     <div className="p-6 space-y-6">
       <div>
@@ -10,60 +13,85 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="hover-scale cursor-pointer" onClick={() => navigate("/users")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <CardTitle className="text-sm font-medium">User Management</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">All registered users</p>
+            <p className="text-xs text-muted-foreground">
+              Create teacher/student accounts, assign roles, and deactivate users.
+            </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card
+          className="hover-scale cursor-pointer"
+          onClick={() => navigate("/admin/system-overview")}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Submissions</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">System Overview</CardTitle>
+            <BarChart2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">Total report submissions</p>
+            <p className="text-xs text-muted-foreground">
+              See total submissions, evaluations, and plagiarism indicators.
+            </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card
+          className="hover-scale cursor-pointer"
+          onClick={() => navigate("/admin/evaluation-config")}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Teachers</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">Teachers with activity</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">System Status</CardTitle>
+            <CardTitle className="text-sm font-medium">Evaluation Configuration</CardTitle>
             <Settings className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">Healthy</div>
-            <p className="text-xs text-muted-foreground">All systems operational</p>
+            <p className="text-xs text-muted-foreground">
+              Configure grading thresholds, weights, and allowed file formats.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card
+          className="hover-scale cursor-pointer"
+          onClick={() => navigate("/admin/logs/evaluations")}
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Reports &amp; Logs</CardTitle>
+            <ClipboardList className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-muted-foreground">
+              Inspect evaluation history and error logs for debugging.
+            </p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>User Management</CardTitle>
-          <CardDescription>Manage roles and permissions</CardDescription>
+          <CardTitle>Quick Links</CardTitle>
+          <CardDescription>Jump directly to key admin tools</CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-sm">
-            User management interface will be implemented in Phase 2
-          </p>
+        <CardContent className="flex flex-wrap gap-3 text-sm">
+          <button
+            type="button"
+            className="underline text-primary"
+            onClick={() => navigate("/admin/logs/evaluations")}
+          >
+            Evaluation logs
+          </button>
+          <span className="text-muted-foreground">•</span>
+          <button
+            type="button"
+            className="underline text-primary"
+            onClick={() => navigate("/admin/logs/errors")}
+          >
+            Error logs
+          </button>
         </CardContent>
       </Card>
     </div>
