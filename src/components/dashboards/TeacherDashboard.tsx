@@ -142,18 +142,7 @@ export default function TeacherDashboard() {
           <h1 className="text-3xl font-bold mb-2">Teacher Dashboard</h1>
           <p className="text-muted-foreground">Academic control and grading oversight</p>
         </div>
-        <div className="flex flex-col items-end gap-1">
-          <Button variant="outline" size="sm" onClick={handleDemoMode}>
-            Demo Mode: Jump to graded example
-          </Button>
-          <p className="text-[11px] text-muted-foreground max-w-xs text-right">
-            Requires at least one submission to be graded or approved. Otherwise, you’ll be
-            taken to pending submissions to run grading first.
-          </p>
-          <p className="text-[11px] text-muted-foreground">
-            Used today: <span className="font-semibold">{demoUsageToday}</span>
-          </p>
-        </div>
+        <div className="flex flex-col items-end gap-1" />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
