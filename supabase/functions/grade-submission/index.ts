@@ -11,6 +11,8 @@ interface RubricSection {
   name: string;
   description: string;
   max_marks: number;
+  keywords?: string;
+  concept_expectations?: string;
 }
 
 interface Rubric {
@@ -105,7 +107,13 @@ Be fair, objective, and constructive in your evaluation.`;
 
     const rubricSections = rubric.sections as RubricSection[];
     const rubricText = rubricSections
-      .map((s, i) => `Section ${i + 1}: ${s.name} (Max: ${s.max_marks} marks)\nExpectations: ${s.description}`)
+      .map((s, i) => {
+        const keywordText = s.keywords ? `\nKey keywords/phrases to look for: ${s.keywords}` : "";
+        const conceptText = s.concept_expectations
+          ? `\nConcept expectations: ${s.concept_expectations}`
+          : "";
+        return `Section ${i + 1}: ${s.name} (Max: ${s.max_marks} marks)\nExpectations: ${s.description}${keywordText}${conceptText}`;
+      })
       .join("\n\n");
 
     const userPrompt = `Grade this academic report based on the following rubric:

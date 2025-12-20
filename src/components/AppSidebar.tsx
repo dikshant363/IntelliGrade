@@ -31,6 +31,7 @@ export function AppSidebar() {
     { title: "Dashboard", url: "/dashboard", icon: Home },
     { title: "Rubrics", url: "/rubrics", icon: ClipboardList },
     { title: "Submissions", url: "/submissions", icon: FileText },
+    { title: "Analytics", url: "/teacher/analytics", icon: ClipboardList },
   ];
 
   const studentItems = [

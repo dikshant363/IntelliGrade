@@ -218,17 +218,17 @@ export default function TeacherDashboard() {
 
         <Card className="border-dashed">
           <CardHeader>
-            <CardTitle className="text-base">How to run AI grading</CardTitle>
-            <CardDescription>Quick teacher guide (no Demo Mode)</CardDescription>
+            <CardTitle className="text-base">Class Analytics</CardTitle>
+            <CardDescription>See score bands and export CSV</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm text-muted-foreground">
-            <ol className="list-decimal list-inside space-y-1">
-              <li>Ask students to upload reports from their Student dashboard.</li>
-              <li>Open <span className="font-medium">Student Submissions</span> and filter to pending or graded.</li>
-              <li>Click a submission to open the detail view, then run AI grading.</li>
-              <li>Review section scores, adjust if needed, and click approve to finalize.</li>
-            </ol>
-            <p className="text-xs">Once approved, students can see their final marks and feedback.</p>
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              Open the analytics view to see how your class is performing overall and export a
+              CSV of recent results.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => navigate("/teacher/analytics")}>
+              View Analytics
+            </Button>
           </CardContent>
         </Card>
       </div>
