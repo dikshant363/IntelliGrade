@@ -1,8 +1,8 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import AdminDashboard from "@/components/dashboards/AdminDashboard";
-import TeacherDashboard from "@/components/dashboards/TeacherDashboard";
-import StudentDashboard from "@/components/dashboards/StudentDashboard";
+import AdminDashboard from "@/modules/admin/AdminDashboard";
+import TeacherDashboard from "@/modules/teacher/TeacherDashboard";
+import StudentDashboard from "@/modules/student/StudentDashboard";
 
 export default function Dashboard() {
   const { user, role, loading } = useAuth();
