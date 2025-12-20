@@ -19,11 +19,18 @@ type Submission = {
   student_id?: string;
 };
 
+type RubricInfo = {
+  id: string;
+  title: string;
+  subject: string;
+};
+
 export default function SubmissionDetail() {
   const { id } = useParams<{ id: string }>();
   const { user, role } = useAuth();
   const navigate = useNavigate();
   const [submission, setSubmission] = useState<Submission | null>(null);
+  const [rubric, setRubric] = useState<RubricInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [grading, setGrading] = useState(false);
   const [gradingResult, setGradingResult] = useState<any | null>(null);
@@ -50,6 +57,20 @@ export default function SubmissionDetail() {
 
       if (error) throw error;
       setSubmission(data);
+
+      if (data.rubric_id) {
+        const { data: rubricData, error: rubricError } = await supabase
+          .from("rubrics")
+          .select("id, title, subject")
+          .eq("id", data.rubric_id)
+          .maybeSingle();
+
+        if (!rubricError && rubricData) {
+          setRubric(rubricData as RubricInfo);
+        }
+      } else {
+        setRubric(null);
+      }
     } catch (error: any) {
       toast.error("Failed to load submission");
       navigate("/dashboard");
@@ -320,6 +341,11 @@ export default function SubmissionDetail() {
               </CardTitle>
               <CardDescription>
                 Submitted on {new Date(submission.created_at).toLocaleString()}
+                {rubric && (
+                  <span className="block text-xs text-muted-foreground mt-1">
+                    Rubric: <span className="font-medium">{rubric.title}</span>  b7 Subject: {rubric.subject}
+                  </span>
+                )}
               </CardDescription>
             </div>
             <div className="flex flex-col items-end gap-2">
