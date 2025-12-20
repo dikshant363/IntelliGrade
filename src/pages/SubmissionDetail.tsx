@@ -198,6 +198,26 @@ export default function SubmissionDetail() {
         ? gradingResult.final_section_grades
         : gradingResult.section_grades;
 
+    // Rubric overview
+    doc.setFontSize(14);
+    doc.text("Rubric Overview", left, y);
+    y += 8;
+    doc.setFontSize(12);
+    sections.forEach((section: any, index: number) => {
+      if (y > 260) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(
+        `${index + 1}. ${section.section_name} - Max ${section.max_marks} marks`,
+        left,
+        y,
+      );
+      y += 6;
+    });
+    y += 4;
+
+    // Section-wise marks and feedback
     doc.setFontSize(14);
     doc.text("Section-wise Marks & Feedback", left, y);
     y += 8;
