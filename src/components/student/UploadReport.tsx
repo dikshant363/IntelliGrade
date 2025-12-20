@@ -138,6 +138,9 @@ export default function UploadReport() {
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="rubric-select">Select Rubric *</Label>
+          <p className="text-xs text-muted-foreground">
+            This controls which criteria the AI uses to grade your report.
+          </p>
           <Select value={selectedRubricId} onValueChange={setSelectedRubricId} disabled={uploading}>
             <SelectTrigger>
               <SelectValue placeholder="Choose grading rubric" />
