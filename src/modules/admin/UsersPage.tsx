@@ -16,6 +16,7 @@ type Profile = {
   id: string;
   email: string | null;
   created_at: string;
+  is_active: boolean;
 };
 
 type UserRole = {
@@ -381,7 +382,7 @@ export default function Users() {
             {roleFilter !== "all" && ` of ${users.length}`} )
           </CardTitle>
           <CardDescription>
-            Assign roles and verify IDs for teachers and students
+            Assign roles, verify IDs, and deactivate accounts when needed
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -394,13 +395,14 @@ export default function Users() {
                   <TableHead>User ID</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Joined</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredUsers.map((u) => (
-                  <TableRow key={u.id}>
+                  <TableRow key={u.id} className={u.is_active ? "" : "opacity-60"}>
                     <TableCell className="font-mono text-xs text-muted-foreground max-w-[220px] truncate">
                       {u.id}
                     </TableCell>
@@ -420,28 +422,41 @@ export default function Users() {
                         </Badge>
                       </div>
                     </TableCell>
+                    <TableCell>
+                      <Badge variant={u.is_active ? "secondary" : "outline"}>
+                        {u.is_active ? "Active" : "Deactivated"}
+                      </Badge>
+                    </TableCell>
                     <TableCell className="text-muted-foreground">
                       {new Date(u.created_at).toLocaleDateString()}
                     </TableCell>
-                    <TableCell>
-                      {u.id === user?.id ? (
-                        <span className="text-sm text-muted-foreground">Can't change own role</span>
-                      ) : (
-                        <Select
-                          value={u.role || ""}
-                          onValueChange={(value) =>
-                            handleRoleChange(u.id, value as "admin" | "teacher" | "student")
-                          }
+                    <TableCell className="space-x-2">
+                      {u.id !== user?.id && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={u.is_active ? "outline" : "default"}
+                          onClick={async () => {
+                            try {
+                              const { error } = await supabase
+                                .from("profiles")
+                                .update({ is_active: !u.is_active })
+                                .eq("id", u.id);
+
+                              if (error) throw error;
+                              toast.success(
+                                u.is_active
+                                  ? "User deactivated. They will be signed out on next activity."
+                                  : "User reactivated."
+                              );
+                              fetchUsers();
+                            } catch (error: any) {
+                              toast.error("Failed to update user status: " + error.message);
+                            }
+                          }}
                         >
-                          <SelectTrigger className="w-32">
-                            <SelectValue placeholder="Set role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="teacher">Teacher</SelectItem>
-                            <SelectItem value="student">Student</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          {u.is_active ? "Deactivate" : "Reactivate"}
+                        </Button>
                       )}
                     </TableCell>
                   </TableRow>

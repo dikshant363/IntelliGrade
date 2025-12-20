@@ -13,6 +13,10 @@ import Rubrics from "@/modules/teacher/RubricsPage";
 import SubmissionDetail from "@/modules/teacher/SubmissionDetailPage";
 import Submissions from "@/modules/teacher/SubmissionsPage";
 import MySubmissionsPage from "@/modules/student/MySubmissionsPage";
+import SystemOverviewPage from "@/modules/admin/SystemOverviewPage";
+import EvaluationConfigPage from "@/modules/admin/EvaluationConfigPage";
+import EvaluationLogsPage from "@/modules/admin/EvaluationLogsPage";
+import ErrorLogsPage from "@/modules/admin/ErrorLogsPage";
 import DashboardLayout from "./components/layouts/DashboardLayout";
 import NotFound from "./pages/NotFound";
 
@@ -38,6 +42,10 @@ const App = () => (
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/users" element={<Users />} />
+              <Route path="/admin/system-overview" element={<SystemOverviewPage />} />
+              <Route path="/admin/evaluation-config" element={<EvaluationConfigPage />} />
+              <Route path="/admin/logs/evaluations" element={<EvaluationLogsPage />} />
+              <Route path="/admin/logs/errors" element={<ErrorLogsPage />} />
               <Route path="/rubrics" element={<Rubrics />} />
               <Route path="/submissions" element={<Submissions />} />
               <Route path="/my-submissions" element={<MySubmissionsPage />} />

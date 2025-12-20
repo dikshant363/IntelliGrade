@@ -1,4 +1,4 @@
-import { Home, Users, ClipboardList, FileText, LogOut, GraduationCap } from "lucide-react";
+import { Home, Users, ClipboardList, FileText, LogOut, GraduationCap, Settings } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -22,6 +22,9 @@ export function AppSidebar() {
   const adminItems = [
     { title: "Dashboard", url: "/dashboard", icon: Home },
     { title: "Users", url: "/users", icon: Users },
+    { title: "System Overview", url: "/admin/system-overview", icon: ClipboardList },
+    { title: "Eval Config", url: "/admin/evaluation-config", icon: Settings },
+    { title: "Logs", url: "/admin/logs/evaluations", icon: FileText },
   ];
 
   const teacherItems = [

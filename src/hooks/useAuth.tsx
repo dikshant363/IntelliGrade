@@ -55,20 +55,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function fetchUserRole(userId: string) {
     try {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .single();
+      const [{ data: roleData, error: roleError }, { data: profileData, error: profileError }] =
+        await Promise.all([
+          supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", userId)
+            .single(),
+          supabase
+            .from("profiles")
+            .select("is_active")
+            .eq("id", userId)
+            .maybeSingle(),
+        ]);
 
-      if (error) {
-        console.error("Error fetching role:", error);
+      if (roleError) {
+        console.error("Error fetching role:", roleError);
         setRole(null);
       } else {
-        setRole(data?.role ?? null);
+        setRole(roleData?.role ?? null);
+      }
+
+      if (profileError) {
+        console.error("Error fetching profile status:", profileError);
+      }
+
+      if (profileData && profileData.is_active === false) {
+        toast.error("Your account has been deactivated. Contact an administrator.");
+        await signOut();
       }
     } catch (err) {
-      console.error("Role fetch error:", err);
+      console.error("Role/profile fetch error:", err);
       setRole(null);
     } finally {
       setLoading(false);
