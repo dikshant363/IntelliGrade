@@ -16,6 +16,7 @@ type Submission = {
   status: string;
   created_at: string;
   rubric_id: string | null;
+  student_id?: string;
 };
 
 export default function SubmissionDetail() {
@@ -43,7 +44,7 @@ export default function SubmissionDetail() {
     try {
       const { data, error } = await supabase
         .from("submissions")
-        .select("*")
+        .select("id, file_name, status, created_at, rubric_id, student_id")
         .eq("id", id)
         .single();
 
@@ -291,6 +292,18 @@ export default function SubmissionDetail() {
           <p className="text-muted-foreground">View report and grading results</p>
         </div>
       </div>
+
+      {submission.file_name.startsWith("Demo ") && (
+        <Card className="border-dashed bg-muted/40">
+          <CardContent className="py-3 text-xs text-muted-foreground flex flex-col gap-1">
+            <span className="font-medium">Demo submission</span>
+            <span>
+              This report is seeded demo data so you can safely experiment with AI grading,
+              overrides, and approvals without affecting real students.
+            </span>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

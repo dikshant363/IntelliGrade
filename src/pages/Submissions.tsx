@@ -31,7 +31,8 @@ export default function Submissions() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const filter = searchParams.get("status") ?? "all";
+  const statusFilter = searchParams.get("status") ?? "all";
+  const demoFilter = searchParams.get("demo") ?? "all";
 
   useEffect(() => {
     if (role !== "teacher" && role !== "admin") {
@@ -40,7 +41,7 @@ export default function Submissions() {
     }
     fetchSubmissions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, filter]);
+  }, [role, statusFilter, demoFilter]);
 
   async function fetchSubmissions() {
     try {
@@ -49,10 +50,10 @@ export default function Submissions() {
         .select("id, file_name, status, created_at, student_id")
         .order("created_at", { ascending: false });
 
-      if (filter === "pendingOrGrading") {
+      if (statusFilter === "pendingOrGrading") {
         query = query.in("status", ["pending", "grading"]);
-      } else if (filter !== "all") {
-        query = query.eq("status", filter);
+      } else if (statusFilter !== "all") {
+        query = query.eq("status", statusFilter);
       }
 
       const { data, error } = await query;
@@ -81,27 +82,42 @@ export default function Submissions() {
     pendingOrGrading: "Pending / In Progress Submissions",
   };
 
-  const title = titleByFilter[filter] ?? "Submissions";
+  const title = titleByFilter[statusFilter] ?? "Submissions";
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-1">{title}</h1>
           <p className="text-muted-foreground text-sm">
             Click a submission to open full grading details.
           </p>
         </div>
-        {filter !== "all" && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => navigate("/submissions")}
+        <div className="flex flex-wrap items-center gap-2 justify-end">
+          <select
+            className="border border-input bg-background text-xs rounded-md px-2 py-1"
+            value={demoFilter}
+            onChange={(e) =>
+              navigate(
+                `/submissions?status=${statusFilter}&demo=${e.target.value}`,
+              )
+            }
           >
-            Clear filter
-          </Button>
-        )}
+            <option value="all">All data</option>
+            <option value="demo">Demo only</option>
+            <option value="real">Real only</option>
+          </select>
+          {statusFilter !== "all" && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/submissions")}
+            >
+              Clear filter
+            </Button>
+          )}
+        </div>
       </div>
 
       {loading ? (
