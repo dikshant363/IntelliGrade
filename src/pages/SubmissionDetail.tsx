@@ -312,6 +312,11 @@ export default function SubmissionDetail() {
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
                 {submission.file_name}
+                {submission.file_name.startsWith("Demo ") && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">
+                    Demo
+                  </span>
+                )}
               </CardTitle>
               <CardDescription>
                 Submitted on {new Date(submission.created_at).toLocaleString()}
