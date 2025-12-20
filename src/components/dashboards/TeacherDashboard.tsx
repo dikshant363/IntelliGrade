@@ -133,7 +133,7 @@ export default function TeacherDashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 items-start">
         <Card>
           <CardHeader>
             <CardTitle>Rubric Management</CardTitle>
@@ -162,6 +162,22 @@ export default function TeacherDashboard() {
             <Button variant="outline" size="sm" onClick={() => navigate("/submissions")}>
               View Submissions
             </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="border-dashed">
+          <CardHeader>
+            <CardTitle className="text-base">How to run AI grading</CardTitle>
+            <CardDescription>Quick teacher guide (no Demo Mode)</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <ol className="list-decimal list-inside space-y-1">
+              <li>Ask students to upload reports from their Student dashboard.</li>
+              <li>Open <span className="font-medium">Student Submissions</span> and filter to pending or graded.</li>
+              <li>Click a submission to open the detail view, then run AI grading.</li>
+              <li>Review section scores, adjust if needed, and click approve to finalize.</li>
+            </ol>
+            <p className="text-xs">Once approved, students can see their final marks and feedback.</p>
           </CardContent>
         </Card>
       </div>
