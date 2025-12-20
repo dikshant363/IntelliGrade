@@ -17,24 +17,10 @@ type SubmissionSummary = {
 export default function TeacherDashboard() {
   const [summary, setSummary] = useState<SubmissionSummary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [demoUsageToday, setDemoUsageToday] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchSummary();
-
-    const today = new Date().toISOString().slice(0, 10);
-    const stored = localStorage.getItem("intelligrade-demo-usage");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as { date: string; count: number };
-        if (parsed.date === today && typeof parsed.count === "number") {
-          setDemoUsageToday(parsed.count);
-        }
-      } catch {
-        // ignore parse errors
-      }
-    }
   }, []);
 
   async function fetchSummary() {
@@ -69,67 +55,6 @@ export default function TeacherDashboard() {
       toast.error("Failed to load submission summary");
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function handleDemoMode() {
-    // Track usage locally per day
-    const today = new Date().toISOString().slice(0, 10);
-    setDemoUsageToday((prev) => {
-      const next = prev + 1;
-      const payload = { date: today, count: next };
-      localStorage.setItem("intelligrade-demo-usage", JSON.stringify(payload));
-      return next;
-    });
-
-    try {
-      // Prefer an approved submission for demo; fall back to graded
-      const { data: approved, error: approvedError } = await supabase
-        .from("submissions")
-        .select("id, created_at")
-        .eq("status", "approved")
-        .order("created_at", { ascending: false })
-        .maybeSingle();
-
-      if (approvedError) {
-        console.error("Error loading approved demo submission", approvedError);
-      }
-
-      let target = approved;
-
-      if (!target) {
-        const { data: graded, error: gradedError } = await supabase
-          .from("submissions")
-          .select("id, created_at")
-          .eq("status", "graded")
-          .order("created_at", { ascending: false })
-          .maybeSingle();
-
-        if (gradedError) {
-          console.error("Error loading graded demo submission", gradedError);
-        }
-
-        target = graded;
-      }
-
-      if (!target) {
-        if (summary && summary.total === 0) {
-          toast.info("No submissions in the system yet. Ask a student to upload a report first.");
-          return;
-        }
-
-        toast.info(
-          "No graded or approved submissions yet. Taking you to pending submissions so you can run grading once, then try Demo Mode again.",
-        );
-        navigate("/submissions?status=pendingOrGrading");
-        return;
-      }
-
-
-      navigate(`/submissions/${target.id}`);
-    } catch (error) {
-      console.error("Demo mode navigation error", error);
-      toast.error("Could not open demo submission");
     }
   }
 
