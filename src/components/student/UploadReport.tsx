@@ -9,12 +9,14 @@ import { toast } from "sonner";
 import { Upload, FileText, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
-const ACCEPTED_TYPES = [
-  "application/pdf",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "application/msword",
-];
 const MAX_SIZE = 20 * 1024 * 1024; // 20MB
+
+const DEFAULT_ALLOWED_EXTENSIONS = ["pdf", "doc", "docx"] as const;
+const MIME_BY_EXTENSION: Record<string, string[]> = {
+  pdf: ["application/pdf"],
+  docx: ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+  doc: ["application/msword"],
+};
 
 type Rubric = {
   id: string;
@@ -29,14 +31,15 @@ export default function UploadReport() {
   const [uploading, setUploading] = useState(false);
   const [rubrics, setRubrics] = useState<Rubric[]>([]);
   const [selectedRubricId, setSelectedRubricId] = useState<string>("");
+  const [allowedExtensions, setAllowedExtensions] = useState<string[]>([...DEFAULT_ALLOWED_EXTENSIONS]);
 
   useEffect(() => {
     fetchRubrics();
+    fetchAllowedFormats();
   }, []);
 
   async function fetchRubrics() {
     try {
-      // Fetch active rubrics (students can see what's available)
       const { data } = await supabase
         .from("rubrics")
         .select("id, title, subject, is_active")
@@ -49,17 +52,54 @@ export default function UploadReport() {
     }
   }
 
+  async function fetchAllowedFormats() {
+    try {
+      const { data, error } = await supabase
+        .from("evaluation_settings")
+        .select("value")
+        .eq("key", "allowed_file_formats")
+        .maybeSingle();
+
+      if (error) {
+        console.error("Failed to load allowed formats", error);
+        return;
+      }
+
+      const value = data?.value as string[] | undefined;
+      if (Array.isArray(value) && value.length > 0) {
+        const normalized = value
+          .map((v) => v.toLowerCase().trim())
+          .filter((v) => DEFAULT_ALLOWED_EXTENSIONS.includes(v as any));
+        if (normalized.length > 0) {
+          setAllowedExtensions(normalized);
+        }
+      }
+    } catch (err) {
+      console.error("Error loading allowed formats", err);
+    }
+  }
+
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
-    // Validate file type
-    if (!ACCEPTED_TYPES.includes(selectedFile.type)) {
-      toast.error("Invalid file type. Please upload PDF or DOCX files only.");
+    const ext = selectedFile.name.split(".").pop()?.toLowerCase();
+    if (!ext || !allowedExtensions.includes(ext)) {
+      toast.error(
+        `Invalid file type. Allowed formats: ${allowedExtensions
+          .map((e) => e.toUpperCase())
+          .join(", ")}.`,
+      );
       return;
     }
 
-    // Validate file size
+    const allowedMimes = allowedExtensions.flatMap((e) => MIME_BY_EXTENSION[e] || []);
+
+    if (!allowedMimes.includes(selectedFile.type)) {
+      toast.error("File type does not match allowed formats. Please upload a valid PDF/DOCX file.");
+      return;
+    }
+
     if (selectedFile.size > MAX_SIZE) {
       toast.error("File too large. Maximum size is 20MB.");
       return;
@@ -131,9 +171,11 @@ export default function UploadReport() {
           <Upload className="h-5 w-5" />
           Upload Report
         </CardTitle>
-        <CardDescription>
-          Submit your academic report for AI-assisted grading (PDF or DOCX, max 20MB)
-        </CardDescription>
+          <CardDescription>
+            Submit your academic report for AI-assisted grading (allowed formats: {allowedExtensions
+              .map((e) => e.toUpperCase())
+              .join(", ")}, max 20MB)
+          </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

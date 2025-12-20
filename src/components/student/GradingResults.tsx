@@ -12,6 +12,11 @@ type SectionGrade = {
   feedback: string;
   similarity_score?: number;
   similarity_explanation?: string;
+  structure_compliance?: number;
+  keyword_match?: number;
+  concept_accuracy?: number;
+  strengths?: string[];
+  improvements?: string[];
 };
 
 type GradingResult = {
@@ -55,6 +60,11 @@ export default function GradingResults({ submissionId }: { submissionId: string 
           feedback: s.feedback,
           similarity_score: s.similarity_score,
           similarity_explanation: s.similarity_explanation,
+          structure_compliance: s.structure_compliance,
+          keyword_match: s.keyword_match,
+          concept_accuracy: s.concept_accuracy,
+          strengths: s.strengths,
+          improvements: s.improvements,
         }));
 
         const finalSectionsRaw = (data.final_section_grades as any[]) || null;
@@ -66,6 +76,11 @@ export default function GradingResults({ submissionId }: { submissionId: string 
               feedback: s.feedback,
               similarity_score: s.similarity_score,
               similarity_explanation: s.similarity_explanation,
+              structure_compliance: s.structure_compliance,
+              keyword_match: s.keyword_match,
+              concept_accuracy: s.concept_accuracy,
+              strengths: s.strengths,
+              improvements: s.improvements,
             }))
           : null;
 
@@ -116,6 +131,13 @@ export default function GradingResults({ submissionId }: { submissionId: string 
 
   const percentage = Math.round((displayTotal / result.total_max_marks) * 100);
 
+  const allStrengths = displaySections
+    .flatMap((s) => s.strengths || [])
+    .filter((s, idx, arr) => s && arr.indexOf(s) === idx);
+  const allImprovements = displaySections
+    .flatMap((s) => s.improvements || [])
+    .filter((s, idx, arr) => s && arr.indexOf(s) === idx);
+
   return (
     <div className="space-y-6">
       <Card>
@@ -152,6 +174,31 @@ export default function GradingResults({ submissionId }: { submissionId: string 
             </p>
           )}
           
+          {(allStrengths.length > 0 || allImprovements.length > 0) && (
+            <div className="grid gap-4 md:grid-cols-2 mb-4">
+              {allStrengths.length > 0 && (
+                <div className="p-4 bg-muted rounded-lg">
+                  <h4 className="font-semibold mb-2">Strengths</h4>
+                  <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                    {allStrengths.map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {allImprovements.length > 0 && (
+                <div className="p-4 bg-muted rounded-lg">
+                  <h4 className="font-semibold mb-2">Areas for improvement</h4>
+                  <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                    {allImprovements.map((item, idx) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+          
           {displayOverallFeedback && (
             <div className="p-4 bg-muted rounded-lg mb-4">
               <h4 className="font-semibold mb-2">Overall Feedback</h4>
@@ -165,13 +212,17 @@ export default function GradingResults({ submissionId }: { submissionId: string 
         <CardHeader>
           <CardTitle>Section-wise Breakdown</CardTitle>
           <CardDescription>
-            Detailed marks, similarity, and feedback for each section
+            Detailed marks, structure, keywords, concepts, and feedback for each section
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {displaySections.map((section, index) => {
             const sectionPercentage = Math.round((section.marks_awarded / section.max_marks) * 100);
             const similarity = section.similarity_score ?? null;
+            const structure = section.structure_compliance ?? null;
+            const keywordMatch = section.keyword_match ?? null;
+            const conceptAccuracy = section.concept_accuracy ?? null;
+
             const similarityLabel =
               similarity === null
                 ? null
@@ -182,33 +233,65 @@ export default function GradingResults({ submissionId }: { submissionId: string 
                     : similarity >= 40
                       ? "Partial match"
                       : "Low match";
+
             return (
-              <div key={index} className="border rounded-lg p-4">
+              <div key={index} className="border rounded-lg p-4 space-y-2">
                 <div className="flex items-start justify-between mb-2 gap-4">
-                  <div>
+                  <div className="space-y-1">
                     <h4 className="font-semibold">{section.section_name}</h4>
-                    {similarity !== null && (
-                      <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                        <span>Rubric match:</span>
-                        <Badge variant={similarity >= 80 ? "default" : similarity >= 60 ? "secondary" : "outline"}>
-                          {similarityLabel} ({similarity}%)
+                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      {structure !== null && (
+                        <Badge variant="outline">
+                          Structure compliance: {structure}%
                         </Badge>
-                      </div>
-                    )}
+                      )}
+                      {keywordMatch !== null && (
+                        <Badge variant="outline">
+                          Keyword match: {keywordMatch}%
+                        </Badge>
+                      )}
+                      {conceptAccuracy !== null && (
+                        <Badge variant="outline">
+                          Concept accuracy: {conceptAccuracy}%
+                        </Badge>
+                      )}
+                      {similarity !== null && (
+                        <Badge variant={similarity >= 80 ? "default" : similarity >= 60 ? "secondary" : "outline"}>
+                          Rubric match: {similarityLabel} ({similarity}%)
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <Badge variant="outline">
                     {section.marks_awarded}/{section.max_marks}
                   </Badge>
                 </div>
                 <Progress value={sectionPercentage} className="mb-2" />
-                {similarity !== null && (
-                  <Progress value={similarity} className="mb-2" />
-                )}
                 <p className="text-sm text-muted-foreground mb-1">{section.feedback}</p>
                 {section.similarity_explanation && (
                   <p className="text-xs text-muted-foreground">
                     <span className="font-medium">Why this match score:</span> {section.similarity_explanation}
                   </p>
+                )}
+                {(section.strengths?.length || 0) > 0 && (
+                  <div className="mt-2">
+                    <p className="text-xs font-semibold mb-1">Section strengths</p>
+                    <ul className="list-disc list-inside text-xs text-muted-foreground space-y-0.5">
+                      {section.strengths!.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {(section.improvements?.length || 0) > 0 && (
+                  <div className="mt-2">
+                    <p className="text-xs font-semibold mb-1">Ways to improve this section</p>
+                    <ul className="list-disc list-inside text-xs text-muted-foreground space-y-0.5">
+                      {section.improvements!.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </div>
             );

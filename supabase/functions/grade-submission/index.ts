@@ -155,7 +155,7 @@ Provide detailed section-wise grading with marks, feedback, and similarity asses
                 properties: {
                   section_grades: {
                     type: "array",
-                    description: "Grades for each rubric section",
+                    description: "Grades and analytics for each rubric section",
                     items: {
                       type: "object",
                       properties: {
@@ -165,14 +165,44 @@ Provide detailed section-wise grading with marks, feedback, and similarity asses
                         feedback: { type: "string" },
                         similarity_score: {
                           type: "number",
-                          description: "Similarity or alignment score (0-100) between the student's work and rubric expectations",
+                          description:
+                            "Overall similarity or alignment score (0-100) between the student's work and rubric expectations",
                         },
                         similarity_explanation: {
                           type: "string",
                           description: "Short explanation of why this similarity score was assigned",
                         },
+                        structure_compliance: {
+                          type: "number",
+                          description: "How well the section follows the expected structure (0-100)",
+                        },
+                        keyword_match: {
+                          type: "number",
+                          description:
+                            "How well the content covers the key keywords/phrases for this section (0-100)",
+                        },
+                        concept_accuracy: {
+                          type: "number",
+                          description:
+                            "How accurately the student demonstrates the underlying concepts for this section (0-100)",
+                        },
+                        strengths: {
+                          type: "array",
+                          description: "Short bullet points describing what the student did well in this section",
+                          items: { type: "string" },
+                        },
+                        improvements: {
+                          type: "array",
+                          description: "Short bullet points describing how the student can improve this section",
+                          items: { type: "string" },
+                        },
                       },
-                      required: ["section_name", "marks_awarded", "max_marks", "feedback"],
+                      required: [
+                        "section_name",
+                        "marks_awarded",
+                        "max_marks",
+                        "feedback",
+                      ],
                     },
                   },
                   overall_feedback: {
