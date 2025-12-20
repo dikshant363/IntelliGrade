@@ -17,10 +17,16 @@ type SubmissionSummary = {
 export default function TeacherDashboard() {
   const [summary, setSummary] = useState<SubmissionSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchSummary();
+
+    const seen = localStorage.getItem("intelligrade-teacher-onboarding-dismissed");
+    if (!seen) {
+      setShowOnboarding(true);
+    }
   }, []);
 
   async function fetchSummary() {
@@ -69,6 +75,51 @@ export default function TeacherDashboard() {
         </div>
         <div className="flex flex-col items-end gap-1" />
       </div>
+
+      {showOnboarding && (
+        <Card className="border-dashed">
+          <CardHeader>
+            <CardTitle className="text-base">Welcome, teacher</CardTitle>
+            <CardDescription>How to grade and approve reports</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm text-muted-foreground">
+            <ol className="list-decimal list-inside space-y-1">
+              <li>Ask students to upload reports from their Student dashboard.</li>
+              <li>
+                Open <span className="font-medium">Student Submissions</span> and filter to
+                pending or graded.
+              </li>
+              <li>
+                Click a submission to open the detail view, then run AI grading to generate
+                section-wise marks and feedback.
+              </li>
+              <li>
+                Review the AI result, adjust scores if needed, and click approve to finalize the
+                grade.
+              </li>
+            </ol>
+            <p className="text-xs">
+              Once approved, students can see their final marks, feedback, and download their
+              report summary.
+            </p>
+            <div className="flex justify-end pt-1">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  localStorage.setItem(
+                    "intelligrade-teacher-onboarding-dismissed",
+                    "true",
+                  );
+                  setShowOnboarding(false);
+                }}
+              >
+                Got it
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card
