@@ -17,6 +17,7 @@ import SystemOverviewPage from "@/modules/admin/SystemOverviewPage";
 import EvaluationConfigPage from "@/modules/admin/EvaluationConfigPage";
 import EvaluationLogsPage from "@/modules/admin/EvaluationLogsPage";
 import ErrorLogsPage from "@/modules/admin/ErrorLogsPage";
+import ClassAnalyticsPage from "@/modules/teacher/ClassAnalyticsPage";
 import DashboardLayout from "./components/layouts/DashboardLayout";
 import NotFound from "./pages/NotFound";
 
@@ -50,6 +51,7 @@ const App = () => (
               <Route path="/submissions" element={<Submissions />} />
               <Route path="/my-submissions" element={<MySubmissionsPage />} />
               <Route path="/submission/:id" element={<SubmissionDetail />} />
+              <Route path="/teacher/analytics" element={<ClassAnalyticsPage />} />
               {/* Additional protected routes will go here */}
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

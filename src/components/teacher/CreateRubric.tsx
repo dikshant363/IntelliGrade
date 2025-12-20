@@ -13,6 +13,8 @@ type RubricSection = {
   name: string;
   description: string;
   max_marks: number;
+  keywords?: string; // comma-separated keywords
+  concept_expectations?: string;
 };
 
 export default function CreateRubric({ onSuccess }: { onSuccess: () => void }) {
@@ -21,12 +23,15 @@ export default function CreateRubric({ onSuccess }: { onSuccess: () => void }) {
   const [description, setDescription] = useState("");
   const [subject, setSubject] = useState("");
   const [sections, setSections] = useState<RubricSection[]>([
-    { name: "", description: "", max_marks: 0 },
+    { name: "", description: "", max_marks: 0, keywords: "", concept_expectations: "" },
   ]);
   const [saving, setSaving] = useState(false);
 
   function addSection() {
-    setSections([...sections, { name: "", description: "", max_marks: 0 }]);
+    setSections([
+      ...sections,
+      { name: "", description: "", max_marks: 0, keywords: "", concept_expectations: "" },
+    ]);
   }
 
   function removeSection(index: number) {
@@ -104,7 +109,9 @@ export default function CreateRubric({ onSuccess }: { onSuccess: () => void }) {
       setTitle("");
       setDescription("");
       setSubject("");
-      setSections([{ name: "", description: "", max_marks: 0 }]);
+      setSections([
+        { name: "", description: "", max_marks: 0, keywords: "", concept_expectations: "" },
+      ]);
       
       onSuccess();
     } catch (error: any) {
@@ -187,6 +194,26 @@ export default function CreateRubric({ onSuccess }: { onSuccess: () => void }) {
                           onChange={(e) => updateSection(index, "description", e.target.value)}
                           rows={2}
                           required
+                        />
+                      </div>
+
+                      <div>
+                        <Label>Key concepts &amp; keywords (optional)</Label>
+                        <Textarea
+                          placeholder="Comma-separated key phrases the AI should look for"
+                          value={section.keywords ?? ""}
+                          onChange={(e) => updateSection(index, "keywords", e.target.value)}
+                          rows={2}
+                        />
+                      </div>
+
+                      <div>
+                        <Label>Concept expectations (optional)</Label>
+                        <Textarea
+                          placeholder="Describe the deeper concepts or reasoning expected in this section"
+                          value={section.concept_expectations ?? ""}
+                          onChange={(e) => updateSection(index, "concept_expectations", e.target.value)}
+                          rows={2}
                         />
                       </div>
 

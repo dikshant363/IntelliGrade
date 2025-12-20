@@ -20,6 +20,8 @@ type RubricSection = {
   name: string;
   description: string;
   max_marks: number;
+  keywords?: string;
+  concept_expectations?: string;
 };
 
 type Rubric = {
@@ -198,6 +200,16 @@ export default function RubricList({ refresh }: { refresh: number }) {
                     <Badge variant="outline">{section.max_marks} marks</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">{section.description}</p>
+                  {section.keywords && (
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-medium">Keywords:</span> {section.keywords}
+                    </p>
+                  )}
+                  {section.concept_expectations && (
+                    <p className="text-xs text-muted-foreground">
+                      <span className="font-medium">Concept expectations:</span> {section.concept_expectations}
+                    </p>
+                  )}
                 </div>
               ))}
             </CardContent>
