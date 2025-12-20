@@ -149,11 +149,16 @@ export default function SubmissionDetail() {
     y += 6;
     doc.text(`Submitted on: ${new Date(submission.created_at).toLocaleString()}`, left, y);
     y += 6;
+    if (rubric) {
+      doc.text(`Rubric: ${rubric.title} (Subject: ${rubric.subject})`, left, y);
+      y += 6;
+    }
 
     const totalMax = gradingResult.total_max_marks;
-    const finalTotal = gradingResult.is_final_approved && gradingResult.final_total_marks != null
-      ? gradingResult.final_total_marks
-      : gradingResult.total_marks_awarded;
+    const finalTotal =
+      gradingResult.is_final_approved && gradingResult.final_total_marks != null
+        ? gradingResult.final_total_marks
+        : gradingResult.total_marks_awarded;
 
     doc.text(`Score: ${finalTotal}/${totalMax}`, left, y);
     y += 8;
