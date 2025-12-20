@@ -14,6 +14,7 @@ import { toast } from "sonner";
   status: string;
   created_at: string;
   student_id: string;
+  is_demo?: boolean;
  };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -56,7 +57,13 @@ export default function Submissions() {
 
       const { data, error } = await query;
       if (error) throw error;
-      setSubmissions(data || []);
+
+      const normalized = (data || []).map((submission) => ({
+        ...submission,
+        is_demo: submission.file_name.startsWith("Demo "),
+      }));
+
+      setSubmissions(normalized);
     } catch (error: any) {
       console.error("Failed to load submissions", error);
       toast.error("Failed to load submissions: " + error.message);
@@ -121,19 +128,29 @@ export default function Submissions() {
                       {submission.file_name}
                     </CardTitle>
                   </div>
-                </div>
-                <Badge variant={submission.status === "approved" ? "default" : "secondary"}>
-                  {STATUS_LABELS[submission.status] ?? submission.status}
-                </Badge>
+                 </div>
+                 <div className="flex flex-col items-end gap-1 text-right">
+                   <Badge variant={submission.status === "approved" ? "default" : "secondary"}>
+                     {STATUS_LABELS[submission.status] ?? submission.status}
+                   </Badge>
+                   {submission.is_demo && (
+                     <span className="text-[10px] text-muted-foreground">Demo data</span>
+                   )}
+                 </div>
               </CardHeader>
-              <CardContent className="flex items-center justify-between pt-0 text-xs text-muted-foreground">
-                <div className="space-y-1">
-                  <span>
-                    Submitted on {new Date(submission.created_at).toLocaleString()}
-                  </span>
-                  <span className="block">Student ID: {submission.student_id}</span>
-                </div>
-                {(submission.status === "pending" || submission.status === "graded") && (
+               <CardContent className="flex items-center justify-between pt-0 text-xs text-muted-foreground">
+                 <div className="space-y-1">
+                   <span>
+                     Submitted on {new Date(submission.created_at).toLocaleString()}
+                   </span>
+                   <span className="block">Student ID: {submission.student_id}</span>
+                   {submission.is_demo && (
+                     <span className="block text-[10px] text-muted-foreground/80">
+                       This is seeded demo data for showcasing IntelliGrade AI.
+                     </span>
+                   )}
+                 </div>
+                 {(submission.status === "pending" || submission.status === "graded") && (
                   <Button
                     type="button"
                     size="sm"
