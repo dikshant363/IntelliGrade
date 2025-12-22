@@ -99,7 +99,7 @@ export default function Submissions() {
             value={demoFilter}
             onChange={(e) =>
               navigate(
-                `/submissions?status=${statusFilter}&demo=${e.target.value}`,
+                `/teacher/submissions?status=${statusFilter}&demo=${e.target.value}`,
               )
             }
           >
@@ -112,7 +112,7 @@ export default function Submissions() {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => navigate("/submissions")}
+              onClick={() => navigate("/teacher/submissions")}
             >
               Clear filter
             </Button>
@@ -134,7 +134,7 @@ export default function Submissions() {
             <Card
               key={submission.id}
               className="hover-scale cursor-pointer"
-              onClick={() => navigate(`/submission/${submission.id}`)}
+              onClick={() => navigate(`/teacher/submissions/${submission.id}`)}
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <div className="flex items-center gap-3">
@@ -144,29 +144,29 @@ export default function Submissions() {
                       {submission.file_name}
                     </CardTitle>
                   </div>
-                 </div>
-                 <div className="flex flex-col items-end gap-1 text-right">
-                   <Badge variant={submission.status === "approved" ? "default" : "secondary"}>
-                     {STATUS_LABELS[submission.status] ?? submission.status}
-                   </Badge>
-                   {submission.is_demo && (
-                     <span className="text-[10px] text-muted-foreground">Demo data</span>
-                   )}
-                 </div>
+                </div>
+                <div className="flex flex-col items-end gap-1 text-right">
+                  <Badge variant={submission.status === "approved" ? "default" : "secondary"}>
+                    {STATUS_LABELS[submission.status] ?? submission.status}
+                  </Badge>
+                  {submission.is_demo && (
+                    <span className="text-[10px] text-muted-foreground">Demo data</span>
+                  )}
+                </div>
               </CardHeader>
-               <CardContent className="flex items-center justify-between pt-0 text-xs text-muted-foreground">
-                 <div className="space-y-1">
-                   <span>
-                     Submitted on {new Date(submission.created_at).toLocaleString()}
-                   </span>
-                   <span className="block">Student ID: {submission.student_id}</span>
-                   {submission.is_demo && (
-                     <span className="block text-[10px] text-muted-foreground/80">
-                       This is seeded demo data for showcasing IntelliGrade AI.
-                     </span>
-                   )}
-                 </div>
-                 {(submission.status === "pending" || submission.status === "graded") && (
+              <CardContent className="flex items-center justify-between pt-0 text-xs text-muted-foreground">
+                <div className="space-y-1">
+                  <span>
+                    Submitted on {new Date(submission.created_at).toLocaleString()}
+                  </span>
+                  <span className="block">Student ID: {submission.student_id}</span>
+                  {submission.is_demo && (
+                    <span className="block text-[10px] text-muted-foreground/80">
+                      This is seeded demo data for showcasing IntelliGrade AI.
+                    </span>
+                  )}
+                </div>
+                {(submission.status === "pending" || submission.status === "graded") && (
                   <Button
                     type="button"
                     size="sm"
@@ -174,7 +174,7 @@ export default function Submissions() {
                     className="text-[11px]"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/submission/${submission.id}`);
+                      navigate(`/teacher/submissions/${submission.id}`);
                     }}
                   >
                     Grade with AI
