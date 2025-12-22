@@ -360,7 +360,7 @@ export default function MySubmissions() {
           {filteredSubmissions.map((submission) => (
             <Link
               key={submission.id}
-              to={`/submission/${submission.id}`}
+              to={`/student/submission/${submission.id}`}
               className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-3 flex-1">

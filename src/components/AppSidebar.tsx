@@ -20,23 +20,23 @@ export function AppSidebar() {
   const { open } = useSidebar();
 
   const adminItems = [
-    { title: "Dashboard", url: "/dashboard", icon: Home },
-    { title: "Users", url: "/users", icon: Users },
+    { title: "Dashboard", url: "/admin/dashboard", icon: Home },
+    { title: "Users", url: "/admin/users", icon: Users },
     { title: "System Overview", url: "/admin/system-overview", icon: ClipboardList },
     { title: "Eval Config", url: "/admin/evaluation-config", icon: Settings },
     { title: "Logs", url: "/admin/logs/evaluations", icon: FileText },
   ];
 
   const teacherItems = [
-    { title: "Dashboard", url: "/dashboard", icon: Home },
-    { title: "Rubrics", url: "/rubrics", icon: ClipboardList },
-    { title: "Submissions", url: "/submissions", icon: FileText },
+    { title: "Dashboard", url: "/teacher/dashboard", icon: Home },
+    { title: "Rubrics", url: "/teacher/rubrics", icon: ClipboardList },
+    { title: "Submissions", url: "/teacher/submissions", icon: FileText },
     { title: "Analytics", url: "/teacher/analytics", icon: ClipboardList },
   ];
 
   const studentItems = [
-    { title: "Dashboard", url: "/dashboard", icon: Home },
-    { title: "My Submissions", url: "/my-submissions", icon: FileText },
+    { title: "Dashboard", url: "/student/dashboard", icon: Home },
+    { title: "My Submissions", url: "/student/my-submissions", icon: FileText },
   ];
 
   let items = studentItems;
