@@ -32,6 +32,7 @@ export default function UploadReport() {
   const [rubrics, setRubrics] = useState<Rubric[]>([]);
   const [selectedRubricId, setSelectedRubricId] = useState<string>("");
   const [allowedExtensions, setAllowedExtensions] = useState<string[]>([...DEFAULT_ALLOWED_EXTENSIONS]);
+  const [lastSubmissionId, setLastSubmissionId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchRubrics();
@@ -134,15 +135,19 @@ export default function UploadReport() {
       if (uploadError) throw uploadError;
 
       // Save metadata to submissions table
-      const { error: dbError } = await supabase.from("submissions").insert({
-        student_id: user.id,
-        file_path: filePath,
-        file_name: file.name,
-        file_size: file.size,
-        mime_type: file.type,
-        status: "pending",
-        rubric_id: selectedRubricId || null,
-      });
+      const { data, error: dbError } = await supabase
+        .from("submissions")
+        .insert({
+          student_id: user.id,
+          file_path: filePath,
+          file_name: file.name,
+          file_size: file.size,
+          mime_type: file.type,
+          status: "pending",
+          rubric_id: selectedRubricId || null,
+        })
+        .select("id")
+        .single();
 
       if (dbError) {
         // Cleanup: delete uploaded file if DB insert fails
@@ -153,9 +158,7 @@ export default function UploadReport() {
       toast.success("Report uploaded successfully!");
       setFile(null);
       setSelectedRubricId("");
-      
-      // Trigger refresh of parent component if needed
-      window.location.reload();
+      setLastSubmissionId(data?.id ?? null);
     } catch (error: any) {
       console.error("Upload error:", error);
       toast.error("Upload failed: " + error.message);
@@ -241,6 +244,30 @@ export default function UploadReport() {
         >
           {uploading ? "Uploading..." : "Upload Report"}
         </Button>
+
+        {lastSubmissionId && (
+          <div className="mt-4 p-3 rounded-lg bg-muted text-sm flex flex-col gap-2">
+            <p className="font-medium">Submission received.</p>
+            <p className="text-muted-foreground">
+              Your report is now in the queue for AI grading. You can track its status or view detailed
+              results once grading is complete.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <a
+                href={`/student/submission/${lastSubmissionId}`}
+                className="text-primary underline underline-offset-2"
+              >
+                View this submission
+              </a>
+              <a
+                href="/student/my-submissions"
+                className="text-primary underline underline-offset-2"
+              >
+                Go to My Submissions
+              </a>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
