@@ -76,6 +76,33 @@ export default function TeacherDashboard() {
         <div className="flex flex-col items-end gap-1" />
       </div>
 
+      {/* IA flow: Define criteria → Review results → Ensure fairness */}
+      <section aria-label="Teacher workflow overview" className="rounded-lg border bg-card p-4 space-y-3">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Define criteria · Review results · Ensure fairness
+        </p>
+        <div className="grid gap-3 md:grid-cols-3 text-sm">
+          <div>
+            <p className="font-medium">1. Define criteria</p>
+            <p className="text-muted-foreground">
+              Create or adjust rubrics so AI knows how to grade structure, keywords, and concepts.
+            </p>
+          </div>
+          <div>
+            <p className="font-medium">2. Review results</p>
+            <p className="text-muted-foreground">
+              Open student submissions, run AI grading, and inspect section-wise scores.
+            </p>
+          </div>
+          <div>
+            <p className="font-medium">3. Ensure fairness</p>
+            <p className="text-muted-foreground">
+              Manually adjust marks where needed and approve final grades for students.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {showOnboarding && (
         <Card className="border-dashed">
           <CardHeader>
@@ -121,70 +148,88 @@ export default function TeacherDashboard() {
         </Card>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card
-          className="hover-scale cursor-pointer"
-          onClick={() => navigate("/submissions?status=pendingOrGrading")}
-        >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending / In Progress</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? "–" : pendingOrGrading}
-            </div>
-            <p className="text-xs text-muted-foreground">Reports awaiting AI grading or review</p>
-          </CardContent>
-        </Card>
+      {/* Dashboard · Submissions Overview & Evaluation Status */}
+      <section
+        aria-label="Submissions overview and evaluation status"
+        className="space-y-3"
+      >
+        <div>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            Submissions Overview
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            See how many reports are waiting, in grading, graded, and fully approved.
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card
+            className="hover-scale cursor-pointer"
+            onClick={() => navigate("/submissions?status=pendingOrGrading")}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending / In Progress</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {loading ? "–" : pendingOrGrading}
+              </div>
+              <p className="text-xs text-muted-foreground">Reports awaiting AI grading or review</p>
+            </CardContent>
+          </Card>
 
-        <Card className="hover-scale">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Submissions</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? "–" : summary?.total ?? 0}
-            </div>
-            <p className="text-xs text-muted-foreground">All student reports in the system</p>
-          </CardContent>
-        </Card>
+          <Card className="hover-scale">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Submissions</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {loading ? "–" : summary?.total ?? 0}
+              </div>
+              <p className="text-xs text-muted-foreground">All student reports in the system</p>
+            </CardContent>
+          </Card>
 
-        <Card
-          className="hover-scale cursor-pointer"
-          onClick={() => navigate("/submissions?status=graded")}
-        >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Graded (awaiting approval)</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? "–" : summary?.graded ?? 0}
-            </div>
-            <p className="text-xs text-muted-foreground">AI-graded, not yet finalized</p>
-          </CardContent>
-        </Card>
+          <Card
+            className="hover-scale cursor-pointer"
+            onClick={() => navigate("/submissions?status=graded")}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Graded (awaiting approval)</CardTitle>
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {loading ? "–" : summary?.graded ?? 0}
+              </div>
+              <p className="text-xs text-muted-foreground">AI-graded, not yet finalized</p>
+            </CardContent>
+          </Card>
 
-        <Card
-          className="hover-scale cursor-pointer"
-          onClick={() => navigate("/submissions?status=approved")}
-        >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Approved</CardTitle>
-            <ClipboardList className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {loading ? "–" : summary?.approved ?? 0}
-            </div>
-            <p className="text-xs text-muted-foreground">Teacher-approved final grades</p>
-          </CardContent>
-        </Card>
-      </div>
+          <Card
+            className="hover-scale cursor-pointer"
+            onClick={() => navigate("/submissions?status=approved")}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Approved</CardTitle>
+              <ClipboardList className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {loading ? "–" : summary?.approved ?? 0}
+              </div>
+              <p className="text-xs text-muted-foreground">Teacher-approved final grades</p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 items-start">
+      {/* Rubric Management, Submission Review, and Finalization entry points */}
+      <section
+        aria-label="Rubric management and review tools"
+        className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 items-start"
+      >
         <Card>
           <CardHeader>
             <CardTitle>Rubric Management</CardTitle>
@@ -203,7 +248,7 @@ export default function TeacherDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Student Submissions</CardTitle>
+            <CardTitle>Submission Review</CardTitle>
             <CardDescription>Review AI-graded reports</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -231,7 +276,7 @@ export default function TeacherDashboard() {
             </Button>
           </CardContent>
         </Card>
-      </div>
+      </section>
     </div>
   );
 }
