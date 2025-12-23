@@ -39,6 +39,7 @@ export function AppSidebar() {
     { title: "Report Submission", url: "/student/report-submission", icon: FileText },
     { title: "Evaluation Results", url: "/student/results", icon: ClipboardList },
     { title: "Download", url: "/student/download", icon: FileText },
+    { title: "Settings", url: "/student/settings", icon: Settings },
   ];
 
   let items = studentItems;
