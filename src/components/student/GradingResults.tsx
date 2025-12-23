@@ -151,14 +151,21 @@ export default function GradingResults({ submissionId }: { submissionId: string 
               <CardDescription>
                 {isFinal
                   ? "Teacher-approved final grade based on AI evaluation"
-                  : "AI-generated evaluation with section-wise feedback"}
+                  : "Automatic evaluation with Total Marks and section-wise scores."}
               </CardDescription>
             </div>
-            <div className="text-right">
+            <div className="text-right space-y-1">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                Total Marks
+              </p>
               <div className="text-3xl font-bold text-primary">
                 {displayTotal}/{result.total_max_marks}
               </div>
-              <Badge variant={percentage >= 70 ? "default" : percentage >= 50 ? "secondary" : "outline"}>
+              <Badge
+                variant={
+                  percentage >= 70 ? "default" : percentage >= 50 ? "secondary" : "outline"
+                }
+              >
                 {percentage}%
               </Badge>
             </div>
@@ -212,7 +219,7 @@ export default function GradingResults({ submissionId }: { submissionId: string 
         <CardHeader>
           <CardTitle>Section-wise Breakdown</CardTitle>
           <CardDescription>
-            Detailed marks, structure, keywords, concepts, and feedback for each section
+            Structure Score, Keyword Score, Concept Accuracy, and feedback for each rubric section.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
