@@ -24,6 +24,7 @@ import NotFound from "./pages/NotFound";
 import StudentDashboard from "@/modules/student/StudentDashboard";
 import TeacherDashboard from "@/modules/teacher/TeacherDashboard";
 import AdminDashboard from "@/modules/admin/AdminDashboard";
+import StudentSettingsPage from "@/modules/student/StudentSettingsPage";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient({
@@ -186,6 +187,14 @@ const App = () => (
                 element={
                   <ProtectedRoute allowedRoles={["student"]}>
                     <StudentDashboard view="download" />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/settings"
+                element={
+                  <ProtectedRoute allowedRoles={["student"]}>
+                    <StudentSettingsPage />
                   </ProtectedRoute>
                 }
               />
