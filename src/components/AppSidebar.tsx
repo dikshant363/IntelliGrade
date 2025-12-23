@@ -35,7 +35,7 @@ export function AppSidebar() {
   ];
 
   const studentItems = [
-    { title: "Dashboard", url: "/student/dashboard", icon: Home },
+    { title: "Dashboard", url: "/student/panel", icon: Home },
     { title: "My Submissions", url: "/student/my-submissions", icon: FileText },
   ];
 
