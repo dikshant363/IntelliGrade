@@ -56,6 +56,36 @@ export default function SystemOverviewPage() {
         </p>
       </div>
 
+      {/* Authentication & Access Control explainer for judges */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Authentication &amp; Access Control</CardTitle>
+          <CardDescription>
+            How IntelliGrade AI routes users to the right panel and enforces role-based behavior.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground space-y-2">
+          <div>
+            <span className="font-medium">Login</span>
+            <p>Users sign in with email/password; authenticated sessions are handled by the backend.</p>
+          </div>
+          <div>
+            <span className="font-medium">Role Identification</span>
+            <p>
+              Each account is linked to a role (admin, teacher, student) stored in the roles table and
+              enforced by policies.
+            </p>
+          </div>
+          <div>
+            <span className="font-medium">Access Routing</span>
+            <p>
+              After login, users are routed to Student, Teacher, or Admin panels, and Row-Level Security
+              ensures they only see and change what they are allowed to.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>
