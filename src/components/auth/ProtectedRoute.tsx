@@ -7,6 +7,13 @@ interface ProtectedRouteProps {
   allowedRoles?: ("admin" | "teacher" | "student")[];
 }
 
+/**
+ * ProtectedRoute enforces authentication and optional role-based access
+ * before rendering the wrapped children.
+ *
+ * - Redirects unauthenticated users to /auth
+ * - Redirects authenticated but unauthorized roles back to /dashboard
+ */
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const { user, role, loading } = useAuth();
   const location = useLocation();

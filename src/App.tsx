@@ -6,7 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
-import Auth from "@/modules/auth/AuthPage";
+import LoginPage from "@/modules/auth/LoginPage";
+import AuthDebugPage from "@/modules/auth/AuthDebugPage";
 import Dashboard from "./pages/Dashboard";
 import Users from "@/modules/admin/UsersPage";
 import Rubrics from "@/modules/teacher/RubricsPage";
@@ -43,7 +44,15 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
+            <Route path="/auth" element={<LoginPage />} />
+            <Route
+              path="/auth/debug"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <AuthDebugPage />
+                </ProtectedRoute>
+              }
+            />
             <Route element={<DashboardLayout />}>
               {/* Role-dispatcher for backwards compatibility and deep links */}
               <Route

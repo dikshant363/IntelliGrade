@@ -14,6 +14,14 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * AuthProvider wires the frontend to the backend authentication system.
+ *
+ * Responsibilities:
+ * - Subscribe to auth state changes
+ * - Load the user's role from the user_roles table
+ * - Expose user, session, role, loading, and signOut via context
+ */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -112,6 +120,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * useAuth gives components access to the authenticated user,
+ * session, role, loading state, and signOut helper.
+ */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
