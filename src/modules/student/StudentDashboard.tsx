@@ -17,7 +17,13 @@ import { toast } from "sonner";
   rubric_id: string | null;
  };
 
-export default function StudentDashboard() {
+type StudentDashboardView = "dashboard" | "submission" | "results" | "download" | "all";
+
+interface StudentDashboardProps {
+  view?: StudentDashboardView;
+}
+
+export default function StudentDashboard({ view = "all" }: StudentDashboardProps) {
   const { user } = useAuth();
   const [stats, setStats] = useState({
     totalSubmissions: 0,
@@ -27,6 +33,8 @@ export default function StudentDashboard() {
   const [latestSubmission, setLatestSubmission] = useState<LatestSubmission | null>(null);
   const [latestResult, setLatestResult] = useState<any | null>(null);
   const [loadingLatest, setLoadingLatest] = useState(false);
+
+  const viewMode: StudentDashboardView = view ?? "all";
 
   useEffect(() => {
     if (user) {
@@ -269,11 +277,19 @@ export default function StudentDashboard() {
               <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                 <div
                   className="h-full bg-primary transition-all duration-300"
-                  style={{ width: `${
-                    (!stats.totalSubmissions ? 1 : stats.pendingReview > 0 && !latestResult ? 2 : latestSubmission && latestResult ? 3 : 2) /
-                    3 *
-                    100
-                  }%` }}
+                  style={{
+                    width: `${
+                      (!stats.totalSubmissions
+                        ? 1
+                        : stats.pendingReview > 0 && !latestResult
+                          ? 2
+                          : latestSubmission && latestResult
+                            ? 3
+                            : 2) /
+                        3 *
+                        100
+                    }%`,
+                  }}
                 />
               </div>
               <p className="mt-1 text-[11px] text-muted-foreground">
@@ -293,154 +309,162 @@ export default function StudentDashboard() {
         </nav>
       </div>
 
-      {/* Dashboard / Submission Status */}
-      <section aria-label="Submission status" className="space-y-3">
-        <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Dashboard / Submission Status
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            Quick overview of how many reports you’ve submitted and what’s still under review.
-          </p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Submissions</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalSubmissions}</div>
-              <p className="text-xs text-muted-foreground">Total reports uploaded</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Average Grade</CardTitle>
-              <Award className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {stats.averageGrade ? `${stats.averageGrade}%` : "--"}
-              </div>
-              <p className="text-xs text-muted-foreground">Across all submissions</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingReview}</div>
-              <p className="text-xs text-muted-foreground">Awaiting teacher approval</p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Report Submission */}
-      <section className="space-y-4" aria-label="Report submission">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Report Submission
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            Upload your PDF/DOCX. After submission, you’ll see its status move from Pending → Graded
-            → Approved.
-          </p>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-2" id="upload-report">
-          <UploadReport />
-          <div className="lg:col-span-2 space-y-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium">My Submissions</h3>
-                <p className="text-xs text-muted-foreground">
-                  This list shows all your uploads with live status so you always know what the system
-                  is doing.
-                </p>
-              </div>
-            </div>
-            <MySubmissions />
+      {/* Page 1: Dashboard / Submission Status */}
+      {(viewMode === "all" || viewMode === "dashboard") && (
+        <section aria-label="Submission status" className="space-y-3">
+          <div>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              Dashboard / Submission Status
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Quick overview of how many reports you’ve submitted and what’s still under review.
+            </p>
           </div>
-        </div>
-      </section>
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Submissions</CardTitle>
+                <FileText className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalSubmissions}</div>
+                <p className="text-xs text-muted-foreground">Total reports uploaded</p>
+              </CardContent>
+            </Card>
 
-      {/* Evaluation Results for latest graded submission */}
-      <section className="space-y-4" aria-label="Evaluation results">
-        <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Evaluation Results (Latest Graded Submission)
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            When at least one of your reports has been graded, you’ll see Total Marks, Structure
-            Score, Keyword Score, Concept Accuracy Score, and Feedback Summary here.
-          </p>
-        </div>
-        {loadingLatest ? (
-          <Card>
-            <CardContent className="p-6 text-xs text-muted-foreground">
-              Loading latest graded submission...
-            </CardContent>
-          </Card>
-        ) : latestSubmission && latestResult ? (
-          <GradingResults submissionId={latestSubmission.id} />
-        ) : (
-          <Card>
-            <CardContent className="p-6 text-xs text-muted-foreground">
-              No graded submissions yet. Once your first report is graded, its Evaluation Results will
-              appear here.
-            </CardContent>
-          </Card>
-        )}
-      </section>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Average Grade</CardTitle>
+                <Award className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {stats.averageGrade ? `${stats.averageGrade}%` : "--"}
+                </div>
+                <p className="text-xs text-muted-foreground">Across all submissions</p>
+              </CardContent>
+            </Card>
 
-      {/* Download Result Report (PDF) */}
-      <section className="space-y-3" aria-label="Download result report">
-        <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Download
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            Download the Result Report (PDF) for your latest graded submission, including marks,
-            breakdown, and feedback.
-          </p>
-        </div>
-        <Card>
-          <CardContent className="flex items-center justify-between py-4">
-            <div className="text-xs text-muted-foreground">
-              {latestSubmission && latestResult ? (
-                <>
-                  <p className="font-medium text-foreground text-sm">
-                    {latestSubmission.file_name}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.pendingReview}</div>
+                <p className="text-xs text-muted-foreground">Awaiting teacher approval</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      )}
+
+      {/* Page 2: Report Submission */}
+      {(viewMode === "all" || viewMode === "submission") && (
+        <section className="space-y-4" aria-label="Report submission">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              Report Submission
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Upload your PDF/DOCX. After submission, you’ll see its status move from Pending →
+              Graded → Approved.
+            </p>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-2" id="upload-report">
+            <UploadReport />
+            <div className="lg:col-span-2 space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium">My Submissions</h3>
+                  <p className="text-xs text-muted-foreground">
+                    This list shows all your uploads with live status so you always know what the
+                    system is doing.
                   </p>
-                  <p>
-                    Graded on {new Date(latestResult.created_at).toLocaleString()} — ready to
-                    download.
-                  </p>
-                </>
-              ) : (
-                <p>
-                  No graded submission available yet. Upload a report and wait for it to be graded to
-                  enable download.
-                </p>
-              )}
+                </div>
+              </div>
+              <MySubmissions />
             </div>
-            <Button
-              type="button"
-              size="sm"
-              disabled={!latestSubmission || !latestResult}
-              onClick={handleDownloadLatestReport}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Result Report (PDF)
-            </Button>
-          </CardContent>
-        </Card>
-      </section>
+          </div>
+        </section>
+      )}
+
+      {/* Page 3: Evaluation Results for latest graded submission */}
+      {(viewMode === "all" || viewMode === "results") && (
+        <section className="space-y-4" aria-label="Evaluation results">
+          <div>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              Evaluation Results (Latest Graded Submission)
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              When at least one of your reports has been graded, you’ll see Total Marks, Structure
+              Score, Keyword Score, Concept Accuracy Score, and Feedback Summary here.
+            </p>
+          </div>
+          {loadingLatest ? (
+            <Card>
+              <CardContent className="p-6 text-xs text-muted-foreground">
+                Loading latest graded submission...
+              </CardContent>
+            </Card>
+          ) : latestSubmission && latestResult ? (
+            <GradingResults submissionId={latestSubmission.id} />
+          ) : (
+            <Card>
+              <CardContent className="p-6 text-xs text-muted-foreground">
+                No graded submissions yet. Once your first report is graded, its Evaluation Results
+                will appear here.
+              </CardContent>
+            </Card>
+          )}
+        </section>
+      )}
+
+      {/* Page 4: Download Result Report (PDF) */}
+      {(viewMode === "all" || viewMode === "download") && (
+        <section className="space-y-3" aria-label="Download result report">
+          <div>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              Download
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Download the Result Report (PDF) for your latest graded submission, including marks,
+              breakdown, and feedback.
+            </p>
+          </div>
+          <Card>
+            <CardContent className="flex items-center justify-between py-4">
+              <div className="text-xs text-muted-foreground">
+                {latestSubmission && latestResult ? (
+                  <>
+                    <p className="font-medium text-foreground text-sm">
+                      {latestSubmission.file_name}
+                    </p>
+                    <p>
+                      Graded on {new Date(latestResult.created_at).toLocaleString()} — ready to
+                      download.
+                    </p>
+                  </>
+                ) : (
+                  <p>
+                    No graded submission available yet. Upload a report and wait for it to be graded
+                    to enable download.
+                  </p>
+                )}
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                disabled={!latestSubmission || !latestResult}
+                onClick={handleDownloadLatestReport}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Result Report (PDF)
+              </Button>
+            </CardContent>
+          </Card>
+        </section>
+      )}
     </div>
   );
 }

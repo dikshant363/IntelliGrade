@@ -35,7 +35,10 @@ export function AppSidebar() {
   ];
 
   const studentItems = [
-    { title: "Dashboard", url: "/student/panel", icon: Home },
+    { title: "Dashboard", url: "/student/dashboard", icon: Home },
+    { title: "Report Submission", url: "/student/report-submission", icon: FileText },
+    { title: "Evaluation Results", url: "/student/results", icon: ClipboardList },
+    { title: "Download", url: "/student/download", icon: FileText },
   ];
 
   let items = studentItems;
