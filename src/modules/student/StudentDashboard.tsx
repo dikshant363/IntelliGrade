@@ -42,9 +42,32 @@ export default function StudentDashboard() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Student Dashboard</h1>
-        <p className="text-muted-foreground">Track your submissions and grades</p>
+      <div className="space-y-3">
+        <div>
+          <h1 className="text-3xl font-bold mb-1">Student Dashboard</h1>
+          <p className="text-muted-foreground">
+            Submit your report, track grading status, and understand AI feedback.
+          </p>
+        </div>
+        <div className="rounded-lg border bg-card p-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            One clear flow
+          </p>
+          <div className="grid gap-3 md:grid-cols-3 text-sm">
+            <div>
+              <p className="font-medium">1. Submit report</p>
+              <p className="text-muted-foreground">Upload your PDF/DOCX using the form below.</p>
+            </div>
+            <div>
+              <p className="font-medium">2. Receive marks</p>
+              <p className="text-muted-foreground">Watch your submission move from pending to graded.</p>
+            </div>
+            <div>
+              <p className="font-medium">3. Understand feedback</p>
+              <p className="text-muted-foreground">Review section-wise scores and download the full report.</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -84,7 +107,7 @@ export default function StudentDashboard() {
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2" id="upload-report">
         <UploadReport />
         <div className="lg:col-span-2">
           <MySubmissions />
