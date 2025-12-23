@@ -161,7 +161,31 @@ const App = () => (
                 path="/student/dashboard"
                 element={
                   <ProtectedRoute allowedRoles={["student"]}>
-                    <StudentDashboard />
+                    <StudentDashboard view="dashboard" />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/report-submission"
+                element={
+                  <ProtectedRoute allowedRoles={["student"]}>
+                    <StudentDashboard view="submission" />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/results"
+                element={
+                  <ProtectedRoute allowedRoles={["student"]}>
+                    <StudentDashboard view="results" />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/student/download"
+                element={
+                  <ProtectedRoute allowedRoles={["student"]}>
+                    <StudentDashboard view="download" />
                   </ProtectedRoute>
                 }
               />
@@ -169,7 +193,7 @@ const App = () => (
                 path="/student/panel"
                 element={
                   <ProtectedRoute allowedRoles={["student"]}>
-                    <StudentDashboard />
+                    <StudentDashboard view="all" />
                   </ProtectedRoute>
                 }
               />
