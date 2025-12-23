@@ -194,39 +194,103 @@ export default function StudentDashboard() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="space-y-3">
+      <div className="space-y-4 animate-fade-in">
         <div>
-          <h1 className="text-3xl font-bold mb-1">Student Dashboard</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold mb-1">Student Panel</h1>
+          <p className="text-muted-foreground text-sm">
             Submit report → Receive marks → Understand feedback.
           </p>
         </div>
-        <div className="rounded-lg border bg-card p-4">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-            One clear flow
+
+        {/* Linear 3-step flow: Upload → Processing → Results */}
+        <nav aria-label="Submission progress" className="rounded-lg border bg-card p-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+            Your 3-step journey
           </p>
-          <p className="text-xs text-muted-foreground mb-3">
-            Submit report → Receive marks → Understand feedback
-          </p>
-          <div className="grid gap-3 md:grid-cols-3 text-sm">
-            <div>
-              <p className="font-medium">1. Submit report</p>
-              <p className="text-muted-foreground">Upload your PDF/DOCX using the form below.</p>
-            </div>
-            <div>
-              <p className="font-medium">2. Receive marks</p>
-              <p className="text-muted-foreground">
-                Watch your submission move from Pending → Graded → Approved.
-              </p>
-            </div>
-            <div>
-              <p className="font-medium">3. Understand feedback</p>
-              <p className="text-muted-foreground">
-                See Evaluation Results and download your Result Report (PDF).
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
+            <ol className="flex-1 grid gap-3 md:grid-cols-3 text-sm">
+              {[1, 2, 3].map((step) => {
+                const currentStep = !stats.totalSubmissions
+                  ? 1
+                  : stats.pendingReview > 0 && !latestResult
+                    ? 2
+                    : latestSubmission && latestResult
+                      ? 3
+                      : 2;
+                const isComplete = currentStep > step;
+                const isActive = currentStep === step;
+                const label =
+                  step === 1
+                    ? "Upload report"
+                    : step === 2
+                      ? "Processing & grading"
+                      : "Results & feedback";
+                const description =
+                  step === 1
+                    ? "Upload your PDF/DOCX file."
+                    : step === 2
+                      ? "System evaluates your work and teacher reviews."
+                      : "See marks, section-wise scores, and feedback.";
+
+                return (
+                  <li
+                    key={step}
+                    className="flex items-start gap-3 hover-scale transition-colors"
+                    aria-current={isActive ? "step" : undefined}
+                  >
+                    <div
+                      className={`flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold ${
+                        isComplete
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : isActive
+                            ? "bg-primary/10 text-primary border-primary"
+                            : "bg-muted text-muted-foreground border-border"
+                      }`}
+                    >
+                      {step}
+                    </div>
+                    <div className="space-y-0.5">
+                      <p
+                        className={`text-xs font-medium ${
+                          isActive ? "text-foreground" : "text-muted-foreground"
+                        }`}
+                      >
+                        {label}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">{description}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+
+            {/* Simple progress bar */}
+            <div className="mt-2 md:mt-0 w-full md:w-40">
+              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-300"
+                  style={{ width: `${
+                    (!stats.totalSubmissions ? 1 : stats.pendingReview > 0 && !latestResult ? 2 : latestSubmission && latestResult ? 3 : 2) /
+                    3 *
+                    100
+                  }%` }}
+                />
+              </div>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Step
+                {
+                  !stats.totalSubmissions
+                    ? " 1 of 3"
+                    : stats.pendingReview > 0 && !latestResult
+                      ? " 2 of 3"
+                      : latestSubmission && latestResult
+                        ? " 3 of 3"
+                        : " 2 of 3"
+                }
               </p>
             </div>
           </div>
-        </div>
+        </nav>
       </div>
 
       {/* Dashboard / Submission Status */}
