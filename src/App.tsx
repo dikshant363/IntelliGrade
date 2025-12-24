@@ -18,6 +18,7 @@ import SystemOverviewPage from "@/modules/admin/SystemOverviewPage";
 import EvaluationConfigPage from "@/modules/admin/EvaluationConfigPage";
 import EvaluationLogsPage from "@/modules/admin/EvaluationLogsPage";
 import ErrorLogsPage from "@/modules/admin/ErrorLogsPage";
+import SystemMonitoringPage from "@/modules/admin/SystemMonitoringPage";
 import ClassAnalyticsPage from "@/modules/teacher/ClassAnalyticsPage";
 import DashboardLayout from "./components/layouts/DashboardLayout";
 import NotFound from "./pages/NotFound";
@@ -92,29 +93,37 @@ const App = () => (
                 }
               />
               <Route
-                path="/admin/evaluation-config"
-                element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
-                    <EvaluationConfigPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/logs/evaluations"
-                element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
-                    <EvaluationLogsPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/logs/errors"
-                element={
-                  <ProtectedRoute allowedRoles={["admin"]}>
-                    <ErrorLogsPage />
-                  </ProtectedRoute>
-                }
-              />
+                 path="/admin/evaluation-config"
+                 element={
+                   <ProtectedRoute allowedRoles={["admin"]}>
+                     <EvaluationConfigPage />
+                   </ProtectedRoute>
+                 }
+               />
+               <Route
+                 path="/admin/system-monitoring"
+                 element={
+                   <ProtectedRoute allowedRoles={["admin"]}>
+                     <SystemMonitoringPage />
+                   </ProtectedRoute>
+                 }
+               />
+               <Route
+                 path="/admin/logs/evaluations"
+                 element={
+                   <ProtectedRoute allowedRoles={["admin"]}>
+                     <EvaluationLogsPage />
+                   </ProtectedRoute>
+                 }
+               />
+               <Route
+                 path="/admin/logs/errors"
+                 element={
+                   <ProtectedRoute allowedRoles={["admin"]}>
+                     <ErrorLogsPage />
+                   </ProtectedRoute>
+                 }
+               />
 
               {/* Teacher routes */}
               <Route

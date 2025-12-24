@@ -21,10 +21,10 @@ export function AppSidebar() {
 
   const adminItems = [
     { title: "Dashboard", url: "/admin/dashboard", icon: Home },
-    { title: "Users", url: "/admin/users", icon: Users },
-    { title: "System Overview", url: "/admin/system-overview", icon: ClipboardList },
-    { title: "Eval Config", url: "/admin/evaluation-config", icon: Settings },
-    { title: "Logs", url: "/admin/logs/evaluations", icon: FileText },
+    { title: "User Management", url: "/admin/users", icon: Users },
+    { title: "Rubric Oversight", url: "/admin/evaluation-config", icon: ClipboardList },
+    { title: "System Overview", url: "/admin/system-overview", icon: Settings },
+    { title: "System Monitoring", url: "/admin/system-monitoring", icon: FileText },
   ];
 
   const teacherItems = [
