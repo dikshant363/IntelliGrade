@@ -19,6 +19,7 @@ import EvaluationConfigPage from "@/modules/admin/EvaluationConfigPage";
 import EvaluationLogsPage from "@/modules/admin/EvaluationLogsPage";
 import ErrorLogsPage from "@/modules/admin/ErrorLogsPage";
 import SystemMonitoringPage from "@/modules/admin/SystemMonitoringPage";
+import SystemUtilitiesPage from "@/modules/admin/SystemUtilitiesPage";
 import ClassAnalyticsPage from "@/modules/teacher/ClassAnalyticsPage";
 import DashboardLayout from "./components/layouts/DashboardLayout";
 import NotFound from "./pages/NotFound";
@@ -105,6 +106,14 @@ const App = () => (
                  element={
                    <ProtectedRoute allowedRoles={["admin"]}>
                      <SystemMonitoringPage />
+                   </ProtectedRoute>
+                 }
+               />
+               <Route
+                 path="/admin/system-utilities"
+                 element={
+                   <ProtectedRoute allowedRoles={["admin"]}>
+                     <SystemUtilitiesPage />
                    </ProtectedRoute>
                  }
                />
