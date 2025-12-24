@@ -29,9 +29,11 @@ export function AppSidebar() {
 
   const teacherItems = [
     { title: "Dashboard", url: "/teacher/dashboard", icon: Home },
-    { title: "Rubrics", url: "/teacher/rubrics", icon: ClipboardList },
-    { title: "Submissions", url: "/teacher/submissions", icon: FileText },
+    { title: "Rubric Management", url: "/teacher/rubrics", icon: ClipboardList },
+    { title: "Submission Review", url: "/teacher/submissions", icon: FileText },
+    { title: "Finalization", url: "/teacher/finalization", icon: ClipboardList },
     { title: "Analytics", url: "/teacher/analytics", icon: ClipboardList },
+    { title: "Settings", url: "/teacher/settings", icon: Settings },
   ];
 
   const studentItems = [

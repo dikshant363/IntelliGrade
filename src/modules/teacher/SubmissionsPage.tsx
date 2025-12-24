@@ -24,14 +24,23 @@ const STATUS_LABELS: Record<string, string> = {
   approved: "Approved",
 };
 
-export default function Submissions() {
+type SubmissionsProps = {
+  basePath?: string;
+  defaultStatusFilter?: string;
+};
+
+export default function Submissions({
+  basePath = "/teacher/submissions",
+  defaultStatusFilter = "all",
+}: SubmissionsProps) {
   const { role } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const statusFilter = searchParams.get("status") ?? "all";
+  const statusParam = searchParams.get("status");
+  const statusFilter = statusParam ?? defaultStatusFilter;
   const demoFilter = searchParams.get("demo") ?? "all";
 
   useEffect(() => {
@@ -99,7 +108,7 @@ export default function Submissions() {
             value={demoFilter}
             onChange={(e) =>
               navigate(
-                `/teacher/submissions?status=${statusFilter}&demo=${e.target.value}`,
+                `${basePath}?status=${statusFilter}&demo=${e.target.value}`,
               )
             }
           >
@@ -112,7 +121,7 @@ export default function Submissions() {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => navigate("/teacher/submissions")}
+              onClick={() => navigate(basePath)}
             >
               Clear filter
             </Button>

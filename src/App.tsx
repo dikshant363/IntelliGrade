@@ -25,6 +25,7 @@ import StudentDashboard from "@/modules/student/StudentDashboard";
 import TeacherDashboard from "@/modules/teacher/TeacherDashboard";
 import AdminDashboard from "@/modules/admin/AdminDashboard";
 import StudentSettingsPage from "@/modules/student/StudentSettingsPage";
+import TeacherSettingsPage from "@/modules/teacher/TeacherSettingsPage";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient({
@@ -141,6 +142,17 @@ const App = () => (
                 }
               />
               <Route
+                path="/teacher/finalization"
+                element={
+                  <ProtectedRoute allowedRoles={["teacher"]}>
+                    <Submissions
+                      basePath="/teacher/finalization"
+                      defaultStatusFilter="graded"
+                    />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/teacher/submissions/:id"
                 element={
                   <ProtectedRoute allowedRoles={["teacher"]}>
@@ -153,6 +165,14 @@ const App = () => (
                 element={
                   <ProtectedRoute allowedRoles={["teacher"]}>
                     <ClassAnalyticsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/teacher/settings"
+                element={
+                  <ProtectedRoute allowedRoles={["teacher"]}>
+                    <TeacherSettingsPage />
                   </ProtectedRoute>
                 }
               />
