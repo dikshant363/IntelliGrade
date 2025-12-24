@@ -28,6 +28,11 @@ import AdminDashboard from "@/modules/admin/AdminDashboard";
 import StudentSettingsPage from "@/modules/student/StudentSettingsPage";
 import TeacherSettingsPage from "@/modules/teacher/TeacherSettingsPage";
 import SystemUtilitiesPage from "@/modules/admin/SystemUtilitiesPage";
+import SystemUtilitiesFileProcessingPage from "@/modules/admin/SystemUtilitiesFileProcessingPage";
+import SystemUtilitiesTextProcessingPage from "@/modules/admin/SystemUtilitiesTextProcessingPage";
+import SystemUtilitiesEvaluationEnginePage from "@/modules/admin/SystemUtilitiesEvaluationEnginePage";
+import SystemUtilitiesScoringEnginePage from "@/modules/admin/SystemUtilitiesScoringEnginePage";
+import SystemUtilitiesResultGeneratorPage from "@/modules/admin/SystemUtilitiesResultGeneratorPage";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient({
@@ -114,6 +119,46 @@ const App = () => (
                 element={
                   <ProtectedRoute allowedRoles={["admin"]}>
                     <SystemUtilitiesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/system-utilities/file-processing"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <SystemUtilitiesFileProcessingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/system-utilities/text-processing"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <SystemUtilitiesTextProcessingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/system-utilities/evaluation-engine"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <SystemUtilitiesEvaluationEnginePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/system-utilities/scoring-engine"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <SystemUtilitiesScoringEnginePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/system-utilities/result-generator"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <SystemUtilitiesResultGeneratorPage />
                   </ProtectedRoute>
                 }
               />
