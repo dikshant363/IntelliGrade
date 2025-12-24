@@ -27,6 +27,7 @@ import TeacherDashboard from "@/modules/teacher/TeacherDashboard";
 import AdminDashboard from "@/modules/admin/AdminDashboard";
 import StudentSettingsPage from "@/modules/student/StudentSettingsPage";
 import TeacherSettingsPage from "@/modules/teacher/TeacherSettingsPage";
+import SystemUtilitiesPage from "@/modules/admin/SystemUtilitiesPage";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient({
@@ -93,37 +94,45 @@ const App = () => (
                 }
               />
               <Route
-                 path="/admin/evaluation-config"
-                 element={
-                   <ProtectedRoute allowedRoles={["admin"]}>
-                     <EvaluationConfigPage />
-                   </ProtectedRoute>
-                 }
-               />
-               <Route
-                 path="/admin/system-monitoring"
-                 element={
-                   <ProtectedRoute allowedRoles={["admin"]}>
-                     <SystemMonitoringPage />
-                   </ProtectedRoute>
-                 }
-               />
-               <Route
-                 path="/admin/logs/evaluations"
-                 element={
-                   <ProtectedRoute allowedRoles={["admin"]}>
-                     <EvaluationLogsPage />
-                   </ProtectedRoute>
-                 }
-               />
-               <Route
-                 path="/admin/logs/errors"
-                 element={
-                   <ProtectedRoute allowedRoles={["admin"]}>
-                     <ErrorLogsPage />
-                   </ProtectedRoute>
-                 }
-               />
+                path="/admin/evaluation-config"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <EvaluationConfigPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/system-monitoring"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <SystemMonitoringPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/system-utilities"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <SystemUtilitiesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/logs/evaluations"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <EvaluationLogsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/logs/errors"
+                element={
+                  <ProtectedRoute allowedRoles={["admin"]}>
+                    <ErrorLogsPage />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Teacher routes */}
               <Route
