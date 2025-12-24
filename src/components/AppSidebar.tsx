@@ -25,6 +25,7 @@ export function AppSidebar() {
     { title: "Rubric Oversight", url: "/admin/evaluation-config", icon: ClipboardList },
     { title: "System Overview", url: "/admin/system-overview", icon: Settings },
     { title: "System Monitoring", url: "/admin/system-monitoring", icon: FileText },
+    { title: "System Utilities", url: "/admin/system-utilities", icon: ClipboardList },
   ];
 
   const teacherItems = [
