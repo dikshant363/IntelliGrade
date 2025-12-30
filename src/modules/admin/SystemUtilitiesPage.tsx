@@ -28,13 +28,39 @@ export default function SystemUtilitiesPage() {
         <Link to="/admin/system-utilities/file-processing" className="block">
           <Card className="h-full cursor-pointer transition hover:shadow-md">
             <CardHeader>
-              <CardTitle>Subpage 1 · File Processing</CardTitle>
+              <CardTitle>1 · File Processing</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              <ul className="space-y-2 list-disc list-inside">
-                <li>PDF Parser</li>
-                <li>DOCX Parser</li>
-              </ul>
+            <CardContent className="text-sm text-muted-foreground space-y-3">
+              <p>
+                How IntelliGrade AI converts uploaded student reports into clean, machine-readable
+                text.
+              </p>
+              <div>
+                <p className="font-medium">PDF Parser</p>
+                <p>
+                  Extracts text, headings, and basic structure from PDF files so the evaluation
+                  engine can work with them.
+                </p>
+                <p className="mt-1 font-medium">Pipeline snapshot</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Open PDF and scan pages</li>
+                  <li>Detect text blocks and headings</li>
+                  <li>Merge into a continuous, structured document</li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-medium">DOCX Parser</p>
+                <p>
+                  Reads Word documents and normalizes the styles so the rest of the system sees a
+                  consistent representation.
+                </p>
+                <p className="mt-1 font-medium">Pipeline snapshot</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Read paragraphs and headings</li>
+                  <li>Strip layout-only formatting</li>
+                  <li>Output clean text with section markers</li>
+                </ul>
+              </div>
             </CardContent>
           </Card>
         </Link>
