@@ -31,8 +31,8 @@ export default function LoginPage() {
     try {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+          email: email.trim(),
+          password: password.trim(),
         });
         if (error) throw error;
         toast.success("Logged in successfully!");
@@ -40,8 +40,8 @@ export default function LoginPage() {
       } else {
         const redirectUrl = `${window.location.origin}/dashboard`;
         const { error } = await supabase.auth.signUp({
-          email,
-          password,
+          email: email.trim(),
+          password: password.trim(),
           options: {
             emailRedirectTo: redirectUrl,
           },
@@ -51,7 +51,16 @@ export default function LoginPage() {
         navigate("/dashboard");
       }
     } catch (error: any) {
-      toast.error(error.message || "Authentication failed");
+      console.error("Auth error:", error);
+
+      // Provide more specific feedback for common errors
+      if (error.message === "Invalid login credentials") {
+        toast.error("Invalid email or password. Please check your credentials.");
+      } else if (error.message.includes("Email not confirmed")) {
+        toast.error("Please verify your email address before logging in.");
+      } else {
+        toast.error(error.message || "Authentication failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -68,6 +77,11 @@ export default function LoginPage() {
           <CardDescription>
             {isLogin ? "Sign in to your account" : "Create a new account"}
           </CardDescription>
+          {!isLogin && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Note: The first account created in the system will automatically be assigned the <strong>Admin</strong> role.
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

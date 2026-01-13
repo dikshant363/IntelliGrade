@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,11 +38,7 @@ export default function GradingResults({ submissionId }: { submissionId: string 
   const [result, setResult] = useState<GradingResult | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchGradingResult();
-  }, [submissionId]);
-
-  async function fetchGradingResult() {
+  const fetchGradingResult = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("grading_results")
@@ -51,9 +47,9 @@ export default function GradingResults({ submissionId }: { submissionId: string 
         .maybeSingle();
 
       if (error) throw error;
-      
+
       if (data) {
-        const baseSections = (data.section_grades as any[]).map((s) => ({
+        const baseSections = (data.section_grades as unknown as SectionGrade[]).map((s) => ({
           section_name: s.section_name,
           marks_awarded: s.marks_awarded,
           max_marks: s.max_marks,
@@ -67,21 +63,21 @@ export default function GradingResults({ submissionId }: { submissionId: string 
           improvements: s.improvements,
         }));
 
-        const finalSectionsRaw = (data.final_section_grades as any[]) || null;
+        const finalSectionsRaw = (data.final_section_grades as unknown as SectionGrade[]) || null;
         const finalSections = finalSectionsRaw
           ? finalSectionsRaw.map((s) => ({
-              section_name: s.section_name,
-              marks_awarded: s.marks_awarded,
-              max_marks: s.max_marks,
-              feedback: s.feedback,
-              similarity_score: s.similarity_score,
-              similarity_explanation: s.similarity_explanation,
-              structure_compliance: s.structure_compliance,
-              keyword_match: s.keyword_match,
-              concept_accuracy: s.concept_accuracy,
-              strengths: s.strengths,
-              improvements: s.improvements,
-            }))
+            section_name: s.section_name,
+            marks_awarded: s.marks_awarded,
+            max_marks: s.max_marks,
+            feedback: s.feedback,
+            similarity_score: s.similarity_score,
+            similarity_explanation: s.similarity_explanation,
+            structure_compliance: s.structure_compliance,
+            keyword_match: s.keyword_match,
+            concept_accuracy: s.concept_accuracy,
+            strengths: s.strengths,
+            improvements: s.improvements,
+          }))
           : null;
 
         setResult({
@@ -90,14 +86,18 @@ export default function GradingResults({ submissionId }: { submissionId: string 
           final_section_grades: finalSections,
           final_total_marks: data.final_total_marks ?? null,
           final_overall_feedback: data.final_overall_feedback ?? null,
-        });
+        } as unknown as GradingResult);
       }
     } catch (error: any) {
       console.error("Failed to fetch grading result:", error);
     } finally {
       setLoading(false);
     }
-  }
+  }, [submissionId]);
+
+  useEffect(() => {
+    fetchGradingResult();
+  }, [fetchGradingResult]);
 
   if (loading) {
     return (
@@ -180,7 +180,7 @@ export default function GradingResults({ submissionId }: { submissionId: string 
               with teacher review and possible adjustments.
             </p>
           )}
-          
+
           {(allStrengths.length > 0 || allImprovements.length > 0) && (
             <div className="grid gap-4 md:grid-cols-2 mb-4">
               {allStrengths.length > 0 && (
@@ -205,7 +205,7 @@ export default function GradingResults({ submissionId }: { submissionId: string 
               )}
             </div>
           )}
-          
+
           {displayOverallFeedback && (
             <div className="p-4 bg-muted rounded-lg mb-4">
               <h4 className="font-semibold mb-2">Overall Feedback</h4>

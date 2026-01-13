@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,6 +9,9 @@ import { toast } from "sonner";
 import { ArrowLeft, FileText, Loader2, Sparkles, Download } from "lucide-react";
 import GradingResults from "@/components/student/GradingResults";
 import jsPDF from "jspdf";
+import { Tables } from "@/integrations/supabase/types";
+
+type GradingResult = Tables<"grading_results">;
 
 type Submission = {
   id: string;
@@ -33,21 +36,14 @@ export default function SubmissionDetail() {
   const [rubric, setRubric] = useState<RubricInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [grading, setGrading] = useState(false);
-  const [gradingResult, setGradingResult] = useState<any | null>(null);
+  const [gradingResult, setGradingResult] = useState<GradingResult | null>(null);
   const [overrideSections, setOverrideSections] = useState<any[] | null>(null);
   const [overrideOverall, setOverrideOverall] = useState<string>("");
   const [savingOverrides, setSavingOverrides] = useState(false);
 
   const isTeacher = role === "teacher" || role === "admin";
 
-  useEffect(() => {
-    if (id) {
-      fetchSubmission();
-      fetchGradingResult();
-    }
-  }, [id]);
-
-  async function fetchSubmission() {
+  const fetchSubmission = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("submissions")
@@ -77,9 +73,9 @@ export default function SubmissionDetail() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [id, navigate]);
 
-  async function fetchGradingResult() {
+  const fetchGradingResult = useCallback(async () => {
     if (!id) return;
     try {
       const { data, error } = await supabase
@@ -94,7 +90,7 @@ export default function SubmissionDetail() {
       }
 
       if (data) {
-        setGradingResult(data);
+        setGradingResult(data as GradingResult);
         const baseSections = (data.final_section_grades as any[]) || (data.section_grades as any[]);
         setOverrideSections(baseSections?.map((s) => ({ ...s })) || null);
         setOverrideOverall(data.final_overall_feedback || data.overall_feedback || "");
@@ -102,7 +98,14 @@ export default function SubmissionDetail() {
     } catch (error: any) {
       console.error("Error loading grading result", error);
     }
-  }
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchSubmission();
+      fetchGradingResult();
+    }
+  }, [id, fetchSubmission, fetchGradingResult]);
 
   async function handleGrade() {
     if (!submission || !submission.rubric_id) {
@@ -194,9 +197,9 @@ export default function SubmissionDetail() {
     }
 
     const sections =
-      gradingResult.is_final_approved && gradingResult.final_section_grades
+      (gradingResult.is_final_approved && gradingResult.final_section_grades
         ? gradingResult.final_section_grades
-        : gradingResult.section_grades;
+        : gradingResult.section_grades) as any[];
 
     // Rubric overview
     doc.setFontSize(14);
